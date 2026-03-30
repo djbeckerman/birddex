@@ -1,0 +1,42 @@
+{
+  "name": "BirdDex — My Field Journal",
+  "short_name": "BirdDex",
+  "description": "A Pokédex-style bird collection app for field naturalists. Discover, identify, and track birds near you.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F0E6",
+  "theme_color": "#6B8F4A",
+  "categories": ["lifestyle", "nature", "education"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Log a New Sighting",
+      "short_name": "Log Sighting",
+      "description": "Quickly log a bird sighting",
+      "url": "/?action=log",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Discover Birds",
+      "short_name": "Discover",
+      "description": "Browse birds near you",
+      "url": "/discover",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}

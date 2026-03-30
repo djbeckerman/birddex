@@ -1,0 +1,128 @@
+.cal {
+  background: var(--parchment);
+  border: 1.5px solid var(--tan);
+  border-radius: 10px;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Navigation row */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--tan-light);
+  background: var(--parchment-dark);
+}
+
+.cal-month-label {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brown-dark);
+}
+
+.cal-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--tan);
+  background: var(--parchment);
+  color: var(--brown-mid);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  padding: 0;
+}
+
+.cal-nav-btn:hover:not(:disabled) {
+  background: var(--tan-light);
+  color: var(--brown-dark);
+}
+
+.cal-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Grid: 7 columns */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding: 8px;
+}
+
+.cal-day-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+}
+
+.cal-day:hover:not(:disabled):not(.cal-day--selected) {
+  background: var(--parchment-dark);
+  color: var(--brown-dark);
+}
+
+.cal-day--today {
+  font-weight: 700;
+  color: var(--forest-green-dk);
+}
+
+.cal-day--today::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--forest-green-dk);
+}
+
+.cal-day {
+  position: relative;
+}
+
+.cal-day--selected {
+  background: var(--forest-green-dk) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.cal-day--future {
+  color: var(--tan);
+  cursor: not-allowed;
+}
+
+.cal-day--empty {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}

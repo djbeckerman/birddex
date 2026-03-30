@@ -1,0 +1,922 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Spirit Bird Page
+   Architecture: full-screen portal overlay — nothing from the main app
+   is visible at any point. Video backgrounds crossfade between biomes.
+   Parallax layers always render beneath as a fallback.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Root ─────────────────────────────────────────────────────────────────── */
+
+.sb-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9900;           /* above every app layer */
+  overflow: hidden;
+  font-family: 'Lora', Georgia, serif;
+  background: #06060e;     /* failsafe behind all layers */
+}
+
+/* Full-screen screens stack inside */
+.sb-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BACKGROUND SYSTEM
+   All 4 biome backgrounds rendered simultaneously — only the active one
+   is visible. CSS transitions handle the 1.5s crossfade.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-backgrounds {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Each biome layer */
+.sb-biome-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  will-change: opacity;
+}
+
+.sb-biome-bg--active {
+  opacity: 1;
+}
+
+/* Video element — covers parallax when file exists */
+.sb-biome-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+.sb-biome-video--hidden {
+  display: none;
+}
+
+/* Dark vignette overlay: bottom heavy for text readability, subtle top */
+.sb-biome-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.06) 20%,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(0, 0, 0, 0.22) 72%,
+      rgba(0, 0, 0, 0.60) 100%
+    ),
+    radial-gradient(
+      ellipse 120% 60% at 50% 50%,
+      transparent 40%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PARALLAX LAYERS (z-index 0–1, beneath video)
+   4 layers per biome using data-derived CSS classes via the parent biome class.
+   sb-pl = spirit-bird parallax layer
+   ───────────────────────────────────────────────────────────────────────── */
+
+.sb-pl {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.sb-pl--sky  { z-index: 0; }  /* static gradient sky */
+.sb-pl--ground { z-index: 1; }  /* slowly scrolling terrain */
+.sb-pl--mid    { z-index: 1; }  /* medium-speed texture layer */
+.sb-pl--near   { z-index: 1; }  /* faster overlay details */
+
+
+/* ──────────────────────────────────────────
+   COASTAL (aerial Pacific coastline)
+   Deep navy sky → teal ocean → seafoam
+   Ground: slow diagonal pan of wave pattern
+   ────────────────────────────────────────── */
+
+.sb-biome-bg--coastal .sb-pl--sky {
+  background: linear-gradient(
+    180deg,
+    #041220 0%,
+    #071e35 20%,
+    #0c3258 38%,
+    #1a5080 52%,
+    #2a7eb8 62%,
+    #3a9fd4 70%,
+    #4ab5e0 76%,
+    #5ec8e8 82%,
+    #7fd4ee 88%,
+    #a8e0f4 94%,
+    #c8eef8 100%
+  );
+}
+
+.sb-biome-bg--coastal .sb-pl--ground {
+  background-image:
+    repeating-linear-gradient(
+      110deg,
+      transparent 0px,
+      transparent 55px,
+      rgba(160, 220, 255, 0.07) 55px,
+      rgba(160, 220, 255, 0.07) 58px,
+      transparent 58px,
+      transparent 95px
+    ),
+    repeating-linear-gradient(
+      70deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(255, 255, 255, 0.05) 40px,
+      rgba(255, 255, 255, 0.05) 43px,
+      transparent 43px,
+      transparent 80px
+    );
+  background-size: 200px 200px;
+  animation: parallax-ground-h 22s linear infinite;
+}
+
+.sb-biome-bg--coastal .sb-pl--mid {
+  background:
+    repeating-linear-gradient(
+      125deg,
+      transparent 0px,
+      transparent 28px,
+      rgba(255, 255, 255, 0.04) 28px,
+      rgba(255, 255, 255, 0.04) 30px,
+      transparent 30px,
+      transparent 55px
+    );
+  background-size: 160px 160px;
+  animation: parallax-ground-h 14s linear infinite;
+  opacity: 0.8;
+}
+
+.sb-biome-bg--coastal .sb-pl--near {
+  /* Foam/surf strip near bottom — static graduated brightening */
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 62%,
+    rgba(180, 230, 255, 0.04) 75%,
+    rgba(200, 240, 255, 0.10) 86%,
+    rgba(220, 248, 255, 0.18) 100%
+  );
+}
+
+
+/* ──────────────────────────────────────────
+   MOUNTAIN (aerial high-altitude peaks)
+   Near-black → midnight blue → gold sunrise ridge
+   ────────────────────────────────────────── */
+
+.sb-biome-bg--mountain .sb-pl--sky {
+  background: linear-gradient(
+    180deg,
+    #02030a 0%,
+    #05091c 15%,
+    #0c1238 30%,
+    #182050 44%,
+    #283570 55%,
+    #4a5090 62%,
+    #787280 68%,
+    #b09060 73%,
+    #c8a050 76%,
+    #a07840 80%,
+    #704a22 86%,
+    #3a2410 94%,
+    #100a04 100%
+  );
+}
+
+.sb-biome-bg--mountain .sb-pl--ground {
+  /* Peak silhouettes — triangular ridgeline */
+  background-image:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 48%,
+      rgba(30, 25, 50, 0.60) 52%,
+      rgba(20, 16, 35, 0.80) 58%,
+      rgba(15, 10, 20, 0.88) 68%,
+      rgba(10, 6, 14, 0.92) 100%
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 44px,
+      rgba(210, 180, 100, 0.04) 44px,
+      rgba(210, 180, 100, 0.04) 46px,
+      transparent 46px,
+      transparent 88px
+    );
+  background-size: 100% 100%, 180px 180px;
+  animation: parallax-ground-diag 30s linear infinite;
+  opacity: 0.9;
+}
+
+.sb-biome-bg--mountain .sb-pl--mid {
+  /* Cloud wisp bands */
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 55px,
+    rgba(210, 205, 240, 0.06) 55px,
+    rgba(210, 205, 240, 0.06) 58px,
+    transparent 58px,
+    transparent 112px
+  );
+  background-size: 100% 112px;
+  animation: parallax-cloud-drift 24s linear infinite;
+}
+
+.sb-biome-bg--mountain .sb-pl--near {
+  /* Snow-cap glints */
+  background: radial-gradient(ellipse 70% 20% at 50% 58%, rgba(240, 235, 255, 0.10) 0%, transparent 100%);
+}
+
+
+/* ──────────────────────────────────────────
+   DESERT (aerial mesa / canyon country)
+   Deep brown-black → warm amber → burnt sienna
+   ────────────────────────────────────────── */
+
+.sb-biome-bg--desert .sb-pl--sky {
+  background: linear-gradient(
+    180deg,
+    #0d0604 0%,
+    #1e0d06 12%,
+    #3c1a08 24%,
+    #6a3012 36%,
+    #984820 48%,
+    #c06428 58%,
+    #d87a34 66%,
+    #e89044 72%,
+    #d08040 78%,
+    #b06030 84%,
+    #7a3e18 92%,
+    #3c1c08 100%
+  );
+}
+
+.sb-biome-bg--desert .sb-pl--ground {
+  /* Dune ridge cross-hatch — diagonal lines at low angle */
+  background-image:
+    repeating-linear-gradient(
+      -35deg,
+      transparent 0px,
+      transparent 22px,
+      rgba(170, 90, 20, 0.08) 22px,
+      rgba(170, 90, 20, 0.08) 24px,
+      transparent 24px,
+      transparent 46px
+    ),
+    repeating-linear-gradient(
+      35deg,
+      transparent 0px,
+      transparent 34px,
+      rgba(200, 130, 50, 0.06) 34px,
+      rgba(200, 130, 50, 0.06) 36px,
+      transparent 36px,
+      transparent 66px
+    );
+  background-size: 120px 120px, 160px 160px;
+  animation: parallax-ground-h 18s linear infinite;
+}
+
+.sb-biome-bg--desert .sb-pl--mid {
+  /* Heat shimmer layer */
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 58%,
+    rgba(190, 100, 28, 0.07) 70%,
+    rgba(210, 130, 40, 0.12) 82%,
+    rgba(180, 90, 20, 0.08) 100%
+  );
+  animation: heat-breathe 3.8s ease-in-out infinite alternate;
+}
+
+.sb-biome-bg--desert .sb-pl--near {
+  background: repeating-linear-gradient(
+    -20deg,
+    transparent 0px,
+    transparent 55px,
+    rgba(230, 160, 70, 0.04) 55px,
+    rgba(230, 160, 70, 0.04) 57px,
+    transparent 57px,
+    transparent 110px
+  );
+  background-size: 160px 160px;
+  animation: parallax-ground-h 11s linear infinite reverse;
+  opacity: 0.7;
+}
+
+
+/* ──────────────────────────────────────────
+   FOREST (aerial redwood / conifer canopy)
+   Near-black → deep emerald → gold dappling
+   ────────────────────────────────────────── */
+
+.sb-biome-bg--forest .sb-pl--sky {
+  background: linear-gradient(
+    180deg,
+    #010603 0%,
+    #030e06 12%,
+    #071a0a 24%,
+    #0f2e12 36%,
+    #1a4820 48%,
+    #275e2c 58%,
+    #3a7238 66%,
+    #4a8445 72%,
+    #3c7038 78%,
+    #285428 84%,
+    #163018 92%,
+    #060e06 100%
+  );
+}
+
+.sb-biome-bg--forest .sb-pl--ground {
+  /* Tree crown circles — canopy pattern */
+  background-image:
+    radial-gradient(ellipse 18px 14px at 12% 18%,  rgba(40, 85, 35, 0.55) 0%, transparent 100%),
+    radial-gradient(ellipse 24px 18px at 38% 8%,   rgba(55, 105, 45, 0.48) 0%, transparent 100%),
+    radial-gradient(ellipse 20px 16px at 62% 22%,  rgba(45, 95, 38, 0.52) 0%, transparent 100%),
+    radial-gradient(ellipse 28px 20px at 85% 12%,  rgba(60, 110, 50, 0.45) 0%, transparent 100%),
+    radial-gradient(ellipse 22px 16px at 25% 42%,  rgba(48, 100, 40, 0.50) 0%, transparent 100%),
+    radial-gradient(ellipse 16px 12px at 55% 55%,  rgba(35, 80, 30, 0.55) 0%, transparent 100%),
+    radial-gradient(ellipse 26px 20px at 75% 48%,  rgba(58, 108, 48, 0.46) 0%, transparent 100%),
+    radial-gradient(ellipse 20px 14px at 8%  68%,  rgba(42, 90, 36, 0.52) 0%, transparent 100%),
+    radial-gradient(ellipse 24px 18px at 45% 72%,  rgba(52, 102, 44, 0.48) 0%, transparent 100%),
+    radial-gradient(ellipse 18px 14px at 90% 75%,  rgba(38, 84, 32, 0.50) 0%, transparent 100%);
+  background-size: 220px 220px;
+  animation: parallax-ground-h 20s linear infinite;
+}
+
+.sb-biome-bg--forest .sb-pl--mid {
+  /* Dappled light beams */
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      transparent 0px,
+      transparent 40px,
+      rgba(215, 195, 80, 0.045) 40px,
+      rgba(215, 195, 80, 0.045) 44px,
+      transparent 44px,
+      transparent 90px
+    );
+  background-size: 90px 100%;
+  animation: beam-drift 14s ease-in-out infinite alternate;
+  filter: blur(4px);
+}
+
+.sb-biome-bg--forest .sb-pl--near {
+  background: linear-gradient(
+    180deg,
+    rgba(4, 18, 6, 0.72) 0%,
+    transparent 18%,
+    transparent 82%,
+    rgba(2, 10, 4, 0.65) 100%
+  );
+}
+
+
+/* ── Parallax animation keyframes ─────────────────────────────────────────── */
+
+@keyframes parallax-ground-h {
+  0%   { background-position: 0 0; }
+  100% { background-position: 200px 200px; }
+}
+
+@keyframes parallax-ground-diag {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 180px 180px, 180px 180px; }
+}
+
+@keyframes parallax-cloud-drift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(15vw); }
+}
+
+@keyframes heat-breathe {
+  0%   { opacity: 0.7; transform: scaleY(1); }
+  100% { opacity: 1.0; transform: scaleY(1.012) translateY(-3px); }
+}
+
+@keyframes beam-drift {
+  0%   { transform: translateX(-5%); opacity: 0.8; }
+  100% { transform: translateX(5%);  opacity: 1.1; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTRO SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-screen--intro {
+  background: #07070e;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10;
+}
+
+.sb-drifting-feather {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  color: rgba(255, 255, 255, 0.22);
+  animation: feather-fall 7s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sb-drifting-feather svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes feather-fall {
+  0%   { transform: translateX(-50%) translateY(0)    rotate(-10deg); opacity: 0.10; }
+  20%  { opacity: 0.32; }
+  50%  { transform: translateX(calc(-50% + 12px)) translateY(70px)  rotate(5deg);  opacity: 0.38; }
+  80%  { opacity: 0.25; }
+  100% { transform: translateX(calc(-50% - 8px))  translateY(140px) rotate(-8deg); opacity: 0; }
+}
+
+.sb-intro-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 0 36px;
+  max-width: 480px;
+  text-align: center;
+}
+
+.sb-intro-line1 {
+  font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+  font-weight: 400;
+  color: rgba(245, 235, 210, 0.92);
+  line-height: 1.65;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.sb-intro-line2 {
+  font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+  font-weight: 400;
+  color: rgba(220, 208, 182, 0.72);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sb-intro-tap {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: rgba(180, 168, 140, 0.5);
+  margin: 6px 0 0;
+  animation: tap-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes tap-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.9; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENE SCREEN
+   The biome backgrounds render behind this via the .sb-backgrounds layer.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-screen--scene {
+  z-index: 10;
+  background: transparent;
+}
+
+/* Progress dots */
+.sb-progress {
+  position: absolute;
+  top: max(24px, env(safe-area-inset-top, 24px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 9px;
+  z-index: 20;
+}
+
+.sb-progress-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: background 0.5s, transform 0.3s;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.sb-progress-dot--done {
+  background: rgba(255, 255, 255, 0.82);
+  transform: scale(1.15);
+}
+
+/* Question + choices layout */
+.sb-scene-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 20px 24px max(32px, env(safe-area-inset-bottom, 32px));
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+.sb-prompt {
+  font-size: clamp(1.1rem, 4.2vw, 1.4rem);
+  font-weight: 400;
+  color: rgba(248, 240, 218, 0.98);
+  line-height: 1.55;
+  margin: 0;
+  letter-spacing: 0.01em;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    0 4px 20px rgba(0, 0, 0, 0.40);
+}
+
+/* ── Frosted glass choice pills ───────────────────────────────────────────── */
+
+.sb-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.sb-choice {
+  padding: 15px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  color: rgba(248, 240, 218, 0.95);
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(0.9rem, 3.3vw, 1.02rem);
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background  0.18s ease,
+    border-color 0.18s ease,
+    transform   0.14s ease,
+    opacity     0.28s ease,
+    box-shadow  0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sb-choice:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.44);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.sb-choice:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.sb-choice--selected {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.58) !important;
+  transform: scale(1.025) !important;
+  box-shadow:
+    0 6px 28px rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.sb-choice--faded {
+  opacity: 0.22 !important;
+  transform: scale(0.975) !important;
+}
+
+.sb-choice--pulse {
+  animation: choice-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes choice-pulse {
+  0%, 100% {
+    border-color: rgba(255, 255, 255, 0.26);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  50% {
+    border-color: rgba(255, 255, 255, 0.52);
+    box-shadow: 0 4px 22px rgba(255, 255, 255, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPUTING SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-screen--computing {
+  background: #06060e;
+  z-index: 10;
+}
+
+.sb-drifting-feather--computing {
+  top: 16%;
+  animation: feather-computing 3.5s ease-in-out infinite;
+}
+
+@keyframes feather-computing {
+  0%   { transform: translateX(-50%) translateY(0)     rotate(-7deg); opacity: 0.12; }
+  50%  { transform: translateX(calc(-50% + 10px)) translateY(90px)  rotate(5deg);  opacity: 0.32; }
+  100% { transform: translateX(calc(-50% - 5px))  translateY(180px) rotate(-7deg); opacity: 0; }
+}
+
+.sb-computing-label {
+  font-size: clamp(0.98rem, 3.8vw, 1.22rem);
+  font-weight: 400;
+  color: rgba(245, 235, 210, 0.78);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: computing-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes computing-pulse {
+  0%, 100% { opacity: 0.78; }
+  50%       { opacity: 1.00; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REVEAL SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sb-screen--reveal {
+  background: #07070e;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 10;
+}
+
+.sb-reveal-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 85% 55% at 50% 28%,
+    color-mix(in srgb, var(--sb-glow, #6080a0) 24%, transparent) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.sb-reveal-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 52px 28px max(40px, env(safe-area-inset-bottom, 40px));
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Photo circle */
+.sb-reveal-photo-wrap {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  flex-shrink: 0;
+}
+
+.sb-reveal-photo {
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2.5px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+}
+
+.sb-reveal-photo-placeholder {
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2.5px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.sb-reveal-photo-placeholder svg {
+  width: 72px;
+  height: 72px;
+}
+
+/* Pulsing halo */
+.sb-reveal-halo {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--sb-glow, #6080a0) 34%, transparent) 0%,
+    color-mix(in srgb, var(--sb-glow, #6080a0) 10%, transparent) 52%,
+    transparent 75%
+  );
+  pointer-events: none;
+  animation: halo-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(1);    }
+  50%       { opacity: 1.00; transform: scale(1.07); }
+}
+
+/* "Your Spirit Bird" badge */
+.sb-reveal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sb-glow, #6080a0) 80%, white);
+  background: color-mix(in srgb, var(--sb-glow, #6080a0) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sb-glow, #6080a0) 40%, transparent);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+
+/* Bird name */
+.sb-reveal-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.65rem, 6.5vw, 2.3rem);
+  font-weight: 700;
+  color: rgba(248, 240, 215, 0.98);
+  margin: 2px 0 0;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
+/* Personality description — shows only the characterization, not the opener */
+.sb-reveal-personality {
+  font-size: clamp(0.88rem, 3.2vw, 1.01rem);
+  font-weight: 400;
+  color: rgba(220, 208, 182, 0.82);
+  line-height: 1.82;
+  margin: 2px 0 0;
+  max-width: 400px;
+}
+
+/* CTA row */
+.sb-reveal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* Share button */
+.sb-reveal-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(230, 220, 195, 0.82);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sb-reveal-share:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.34);
+  transform: translateY(-1px);
+}
+
+.sb-reveal-share:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Begin Journey CTA */
+.sb-reveal-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 30px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(255, 255, 255, 0.30);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(248, 240, 215, 0.96);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sb-reveal-cta:hover {
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.50);
+  transform: translateY(-2px);
+}
+
+.sb-reveal-cta:active {
+  transform: translateY(0);
+}
+
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+  .sb-reveal-photo,
+  .sb-reveal-photo-wrap,
+  .sb-reveal-photo-placeholder { width: 170px; height: 170px; }
+  .sb-reveal-body { padding-top: 36px; gap: 14px; }
+  .sb-intro-text  { padding: 0 24px; }
+  .sb-reveal-actions { gap: 10px; }
+  .sb-reveal-share,
+  .sb-reveal-cta { font-size: 0.9rem; padding: 11px 22px; }
+}
+
+@media (max-height: 640px) {
+  .sb-reveal-photo,
+  .sb-reveal-photo-wrap,
+  .sb-reveal-photo-placeholder { width: 150px; height: 150px; }
+  .sb-reveal-body { padding-top: 28px; gap: 12px; }
+  .sb-reveal-halo { inset: -12px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .sb-reveal-body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 24px;
+    gap: 12px;
+  }
+  .sb-reveal-photo-wrap { width: 120px; height: 120px; }
+  .sb-reveal-photo,
+  .sb-reveal-photo-placeholder { width: 120px; height: 120px; }
+  .sb-reveal-name { font-size: 1.4rem; }
+}

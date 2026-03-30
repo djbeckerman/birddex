@@ -1,0 +1,197 @@
+/* ════════════════════════════════════════════════════════════
+   Auth Page — earthy field-journal aesthetic
+   Full-screen portal overlay, z-index above main app
+   ════════════════════════════════════════════════════════════ */
+
+.auth-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9800;
+  background: var(--parchment, #F5F0E6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px max(24px, env(safe-area-inset-bottom, 24px));
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+/* The parchment card */
+.auth-paper {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Brand */
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 28px;
+  color: var(--ink-dark, #2c1f0e);
+}
+
+.auth-brand-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Heading */
+.auth-heading {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.5rem, 5vw, 1.85rem);
+  font-weight: 700;
+  color: var(--ink-dark, #2c1f0e);
+  margin: 0 0 8px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.auth-sub {
+  font-size: 0.875rem;
+  color: var(--ink-muted, #8a7155);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.auth-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-mid, #6b5140);
+}
+
+.auth-input {
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(139, 101, 60, 0.28);
+  background: rgba(255, 252, 245, 0.85);
+  color: var(--ink-dark, #2c1f0e);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.97rem;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.auth-input::placeholder { color: var(--ink-muted, #8a7155); opacity: 0.6; }
+
+.auth-input:focus {
+  border-color: var(--gold, #c8961e);
+  box-shadow: 0 0 0 3px rgba(200, 150, 30, 0.14);
+}
+
+/* Error */
+.auth-error {
+  font-size: 0.84rem;
+  color: #a83232;
+  background: rgba(168, 50, 50, 0.07);
+  border: 1px solid rgba(168, 50, 50, 0.22);
+  border-radius: 7px;
+  padding: 9px 12px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Primary button */
+.auth-btn-primary {
+  margin-top: 4px;
+  padding: 13px 20px;
+  border-radius: 9px;
+  border: none;
+  background: var(--ink-dark, #2c1f0e);
+  color: var(--parchment, #F5F0E6);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.auth-btn-primary:hover:not(:disabled) { background: #1a110a; }
+.auth-btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.auth-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Divider */
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0;
+  color: var(--ink-muted, #8a7155);
+  font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 22px);
+  height: 1px;
+  background: rgba(139, 101, 60, 0.22);
+}
+
+.auth-divider::before { left: 0; }
+.auth-divider::after  { right: 0; }
+
+.auth-divider span {
+  position: relative;
+  background: var(--parchment, #F5F0E6);
+  padding: 0 8px;
+}
+
+/* Toggle + forgot */
+.auth-toggle {
+  background: none;
+  border: none;
+  color: var(--gold, #c8961e);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  padding: 2px 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
+}
+
+.auth-toggle:hover { color: #a07010; }
+
+.auth-forgot {
+  background: none;
+  border: none;
+  color: var(--ink-muted, #8a7155);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  padding: 6px 0;
+  margin-top: 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  -webkit-tap-highlight-color: transparent;
+}

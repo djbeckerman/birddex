@@ -1,0 +1,202 @@
+/* ════════════════════════════════════════════════════════════
+   Profile Setup Page
+   ════════════════════════════════════════════════════════════ */
+
+.psu-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9800;
+  background: var(--parchment, #F5F0E6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(44px, env(safe-area-inset-top, 44px)) 20px max(32px, env(safe-area-inset-bottom, 32px));
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.psu-paper {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.psu-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-dark, #2c1f0e);
+  margin-bottom: 24px;
+}
+
+.psu-brand-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.psu-heading {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.4rem, 5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--ink-dark, #2c1f0e);
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.psu-sub {
+  font-size: 0.875rem;
+  color: var(--ink-muted, #8a7155);
+  line-height: 1.6;
+  margin: 0 0 22px;
+}
+
+/* Spirit bird row */
+.psu-spirit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(200, 150, 30, 0.08);
+  border: 1px solid rgba(200, 150, 30, 0.22);
+  margin-bottom: 24px;
+}
+
+.psu-spirit-photo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(200, 150, 30, 0.4);
+}
+
+.psu-spirit-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(200, 150, 30, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold, #c8961e);
+  flex-shrink: 0;
+}
+
+.psu-spirit-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gold, #c8961e);
+  letter-spacing: 0.02em;
+}
+
+.psu-spirit-hint {
+  font-size: 0.8rem;
+  color: var(--ink-muted, #8a7155);
+  margin-top: 2px;
+}
+
+/* Form */
+.psu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.psu-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.psu-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-mid, #6b5140);
+}
+
+.psu-input {
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(139, 101, 60, 0.28);
+  background: rgba(255, 252, 245, 0.85);
+  color: var(--ink-dark, #2c1f0e);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.97rem;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.psu-input::placeholder { color: var(--ink-muted, #8a7155); opacity: 0.6; }
+
+.psu-input:focus {
+  border-color: var(--gold, #c8961e);
+  box-shadow: 0 0 0 3px rgba(200, 150, 30, 0.14);
+}
+
+.psu-input--error {
+  border-color: #c05050 !important;
+}
+
+/* Username @ prefix */
+.psu-username-wrap {
+  position: relative;
+}
+
+.psu-at {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-muted, #8a7155);
+  font-size: 0.97rem;
+  pointer-events: none;
+}
+
+.psu-input--username {
+  padding-left: 26px;
+}
+
+.psu-field-error {
+  font-size: 0.8rem;
+  color: #a83232;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.psu-error {
+  font-size: 0.84rem;
+  color: #a83232;
+  background: rgba(168, 50, 50, 0.07);
+  border: 1px solid rgba(168, 50, 50, 0.22);
+  border-radius: 7px;
+  padding: 9px 12px;
+  margin: 0;
+}
+
+/* Submit button */
+.psu-btn {
+  margin-top: 4px;
+  padding: 14px 20px;
+  border-radius: 9px;
+  border: none;
+  background: var(--ink-dark, #2c1f0e);
+  color: var(--parchment, #F5F0E6);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.psu-btn:hover:not(:disabled) { background: #1a110a; }
+.psu-btn:active:not(:disabled) { transform: scale(0.98); }
+.psu-btn:disabled { opacity: 0.45; cursor: default; }

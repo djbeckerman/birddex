@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cat /Users/danielbeckerman/Projects/birddex/src/pages/Nearby/*.tsx)",
+      "WebFetch(domain:mixkit.co)",
+      "WebFetch(domain:www.videvo.net)",
+      "WebFetch(domain:coverr.co)",
+      "WebFetch(domain:www.pexels.com)",
+      "WebFetch(domain:pixabay.com)",
+      "Bash(curl -L -o biome-coastal.mp4 \"https://assets.mixkit.co/videos/44392/44392-360.mp4\" -w \"coastal: %{size_download} bytes\\\\n\" --silent)",
+      "Bash(curl -L -o biome-mountain.mp4 \"https://assets.mixkit.co/videos/27028/27028-360.mp4\" -w \"mountain: %{size_download} bytes\\\\n\" --silent)",
+      "Bash(curl -L -o biome-desert.mp4 \"https://assets.mixkit.co/videos/52012/52012-360.mp4\" -w \"desert: %{size_download} bytes\\\\n\" --silent)",
+      "Bash(curl -L -o biome-forest.mp4 \"https://assets.mixkit.co/videos/41545/41545-360.mp4\" -w \"forest: %{size_download} bytes\\\\n\" --silent.)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/danielbeckerman/Projects/birddex/public/video/**)",
+      "Bash(done)",
+      "Bash(find /Users/danielbeckerman/Projects/birddex -maxdepth 1 -name .env*)",
+      "Bash(ls /Users/danielbeckerman/Projects/birddex/.env*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

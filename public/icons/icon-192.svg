@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="#F5F0E6"/>
+  <!-- Outer ring -->
+  <rect width="192" height="192" rx="40" fill="none" stroke="#C8B891" stroke-width="3"/>
+  <!-- Feather body — solid fill for readability at small sizes -->
+  <path
+    d="M128 32
+       C128 32 92 40 72 64
+       C52 88 48 124 48 124
+       L64 108
+       C68 114 76 120 84 120
+       C108 120 128 84 128 32Z"
+    fill="#4A6A32"
+  />
+  <!-- Quill line down the center -->
+  <path
+    d="M48 124 C48 124 64 96 84 88"
+    stroke="#F5F0E6"
+    stroke-width="3"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <!-- Barbs across the feather -->
+  <path d="M72 64 L84 72" stroke="#6B8F4A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M64 76 L78 82" stroke="#6B8F4A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M60 90 L74 93" stroke="#6B8F4A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M57 104 L70 104" stroke="#6B8F4A" stroke-width="2" stroke-linecap="round"/>
+</svg>

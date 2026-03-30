@@ -1,0 +1,318 @@
+.lsm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 24, 16, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+
+.lsm-paper {
+  width: 100%;
+  max-width: 440px;
+  background: #FDFAF4;
+  border: 1.5px solid var(--tan);
+  border-radius: 14px;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+
+}
+
+.lsm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--tan-light);
+}
+
+.lsm-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--brown-dark);
+}
+
+.lsm-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--tan);
+  background: var(--parchment-dark);
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lsm-close:hover {
+  background: var(--tan-light);
+  color: var(--ink);
+}
+
+.lsm-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lsm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+}
+
+.lsm-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-light);
+  letter-spacing: 0.01em;
+}
+
+.lsm-optional {
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.lsm-search-wrap {
+  position: relative;
+}
+
+.lsm-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--tan);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.lsm-input:focus {
+  border-color: var(--brown-mid);
+}
+
+.lsm-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--tan);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.lsm-textarea:focus {
+  border-color: var(--brown-mid);
+}
+
+.lsm-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #FDFAF4;
+  border: 1.5px solid var(--tan);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(60, 47, 30, 0.15);
+  list-style: none;
+  padding: 4px;
+  z-index: 10;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.lsm-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.lsm-dropdown-item:hover {
+  background: var(--parchment-dark);
+}
+
+.lsm-dropdown-common {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--brown-dark);
+}
+
+.lsm-dropdown-sci {
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.lsm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--tan-light);
+}
+
+.lsm-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--tan);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lsm-btn-cancel:hover {
+  background: var(--parchment-dark);
+  color: var(--ink);
+}
+
+.lsm-btn-submit {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--forest-green-dk);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, opacity 0.15s;
+  box-shadow: 0 2px 8px rgba(74, 106, 50, 0.3);
+}
+
+.lsm-btn-submit:hover:not(:disabled) {
+  background: var(--forest-green);
+}
+
+.lsm-btn-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Date trigger button ─────────────────────── */
+
+.lsm-date-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--tan);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  text-align: left;
+}
+
+.lsm-date-trigger:hover {
+  border-color: var(--brown-mid);
+}
+
+.lsm-calendar-wrap {
+  margin-top: 4px;
+  z-index: 20;
+  position: relative;
+}
+
+/* ── "common nearby" badge in dropdown ────────── */
+
+.lsm-dropdown-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--forest-green-dk);
+  background: rgba(107, 143, 74, 0.1);
+  border-radius: 100px;
+  padding: 1px 6px;
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+/* ── Photo upload ─────────────────────────────── */
+
+.lsm-file-input {
+  display: none;
+}
+
+.lsm-photo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px dashed var(--tan);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+  justify-content: center;
+}
+
+.lsm-photo-upload-btn:hover {
+  border-color: var(--brown-mid);
+  background: var(--parchment-dark);
+  color: var(--ink);
+}
+
+.lsm-photo-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lsm-photo-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid var(--tan);
+}
+
+.lsm-photo-remove {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lsm-photo-remove:hover {
+  background: rgba(200, 50, 50, 0.08);
+  color: #8B3030;
+}

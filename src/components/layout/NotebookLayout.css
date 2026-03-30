@@ -1,0 +1,13 @@
+.notebook-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--parchment);
+}
+
+/* Reserve space for mobile bottom nav */
+@media (max-width: 640px) {
+  .notebook-layout {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+}

@@ -1,0 +1,229 @@
+.nb-header {
+  background: var(--parchment-dark);
+  border-bottom: 2px solid var(--tan);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(60, 47, 30, 0.1);
+}
+
+/* ── Top bar ─────────────────────────────────────── */
+.nb-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nb-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nb-brand-feather {
+  width: 24px;
+  height: 24px;
+  color: var(--forest-green);
+  flex-shrink: 0;
+}
+
+.nb-brand-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+  letter-spacing: -0.01em;
+}
+
+.nb-area-label {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  padding: 2px 8px;
+  background: var(--parchment-shadow);
+  border: 1px solid var(--tan-light);
+  border-radius: 100px;
+  font-style: italic;
+}
+
+.nb-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.nb-stat {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.nb-stat strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.nb-stat--week strong { color: var(--forest-green-dk); }
+
+.nb-stat--area {
+  font-style: italic;
+}
+
+/* ── Tab bar ─────────────────────────────────────── */
+.nb-tabs {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 24px;
+  gap: 2px;
+}
+
+.nb-tab {
+  position: relative;
+  padding: 7px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: var(--tan-light);
+  border: 1.5px solid var(--tan);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+  transform: translateY(2px);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.nb-tab:hover {
+  background: var(--parchment-shadow);
+  color: var(--ink);
+  transform: translateY(0);
+}
+
+.nb-tab--active {
+  background: var(--parchment);
+  color: var(--brown-dark);
+  font-weight: 600;
+  border-color: var(--tan);
+  transform: translateY(0);
+  z-index: 1;
+}
+
+.nb-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--parchment);
+}
+
+/* ── Spirit Bird avatar ──────────────────────────────────────────────────── */
+
+.nb-spirit-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--sb-glow, #c8a050) 60%, #c8a050);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--sb-glow, #c8a050) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--sb-glow, #c8a050) 30%, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.nb-spirit-avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--sb-glow, #c8a050) 50%, transparent);
+}
+
+.nb-spirit-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nb-spirit-avatar svg {
+  width: 14px;
+  height: 14px;
+  color: color-mix(in srgb, var(--sb-glow, #c8a050) 80%, #8b6a30);
+  flex-shrink: 0;
+}
+
+/* ── User identity + sign-out ──────────────────────────────── */
+
+.nb-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.nb-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.nb-user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-dark, #2c1f0e);
+  line-height: 1.2;
+}
+
+.nb-user-handle {
+  font-size: 0.7rem;
+  color: var(--ink-muted, #8a7155);
+  line-height: 1.2;
+}
+
+.nb-signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(139, 101, 60, 0.22);
+  background: rgba(139, 101, 60, 0.07);
+  color: var(--ink-muted, #8a7155);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s, border-color 0.16s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.nb-signout:hover {
+  background: rgba(139, 101, 60, 0.14);
+  color: var(--ink-dark, #2c1f0e);
+  border-color: rgba(139, 101, 60, 0.38);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  /* Hide tab bar on mobile — BottomNav takes over */
+  .nb-tabs { display: none; }
+  .nb-header-top { padding: 10px 14px 10px; }
+  .nb-area-label { display: none; }
+  .nb-stats { gap: 10px; }
+  .nb-stat { font-size: 0.72rem; }
+  .nb-user-name { font-size: 0.75rem; }
+  .nb-user-handle { display: none; }
+}
+
+@media (max-width: 480px) {
+  .nb-header-top { padding: 8px 14px 8px; }
+}

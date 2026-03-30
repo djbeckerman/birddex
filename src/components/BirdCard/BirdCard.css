@@ -1,0 +1,711 @@
+/* ── Card shell ─────────────────────────────────────── */
+
+.bird-card {
+  position: relative;
+  cursor: pointer;
+  aspect-ratio: 3 / 4;
+}
+
+.bird-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Both faces shared ──────────────────────────────── */
+
+.bird-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #FDFAF4;
+  border: 1.5px solid var(--tan);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.bird-card:hover .bird-card-face {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ── Front face ──────────────────────────────────────── */
+
+.bird-card-photo-wrap {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: var(--parchment-dark);
+  min-height: 0;
+}
+
+.bird-card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.bird-card-photo--loaded {
+  opacity: 1;
+}
+
+.bird-card-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--parchment-dark), var(--parchment-shadow));
+}
+
+.bird-card-outline-svg {
+  width: 70%;
+  height: 70%;
+  opacity: 0.5;
+}
+
+/* Unspotted silhouette */
+.bird-card-silhouette-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--parchment-dark), var(--tan-light));
+}
+
+.bird-card-silhouette-svg {
+  width: 65%;
+  height: 65%;
+}
+
+.bird-card-silhouette-fog {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, transparent 30%, rgba(200, 184, 145, 0.35) 100%);
+  pointer-events: none;
+}
+
+/* Spotted badge */
+.bird-card-spotted-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px 3px 6px;
+  border-radius: 100px;
+  background: var(--forest-green-dk);
+  color: #fff;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 1px 4px rgba(74, 106, 50, 0.45);
+}
+
+/* Likelihood tag */
+.bird-card-likelihood-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: rgba(60, 47, 30, 0.55);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(4px);
+}
+
+/* Info section */
+.bird-card-info {
+  padding: 10px 12px 0;
+  border-top: 1px solid var(--tan-light);
+  flex-shrink: 0;
+}
+
+.bird-card-common-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--brown-dark);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bird-card-unknown {
+  color: var(--brown-mid);
+  font-style: italic;
+}
+
+.bird-card-unknown-sub {
+  color: var(--tan);
+}
+
+.bird-card-sci-name {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bird-card-location,
+.bird-card-date {
+  font-size: 0.67rem;
+  color: var(--ink-muted);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Actions row (flip + log) */
+.bird-card-actions {
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--tan-light);
+}
+
+.bird-card-flip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  padding: 7px 6px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--tan-light);
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.bird-card-flip-btn:hover {
+  background: rgba(107, 143, 74, 0.07);
+  color: var(--forest-green-dk);
+}
+
+.bird-card-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  padding: 7px 6px;
+  background: transparent;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.bird-card-toggle:hover {
+  background: rgba(107, 143, 74, 0.08);
+  color: var(--forest-green-dk);
+}
+
+.bird-card-toggle--spotted {
+  color: var(--forest-green-dk);
+}
+
+.bird-card-toggle--spotted:hover {
+  background: rgba(200, 50, 50, 0.06);
+  color: #8B3030;
+}
+
+/* Unspotted card — faded overall */
+.bird-card--unspotted .bird-card-face {
+  opacity: 0.82;
+}
+
+.bird-card--unspotted:hover .bird-card-face {
+  opacity: 1;
+}
+
+/* Rarity badge (discover mode) */
+.bird-card-rarity-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rarity-color);
+  background: var(--rarity-bg);
+  border: 1px solid var(--rarity-color);
+  backdrop-filter: blur(4px);
+}
+
+/* Quick-spot button (discover mode) */
+.bird-card-quick-spot-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  padding: 8px 6px;
+  background: var(--forest-green-dk);
+  border: none;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  min-height: 40px;
+}
+
+.bird-card-quick-spot-btn:hover {
+  background: var(--forest-green);
+}
+
+/* Already-spotted in discover mode — don't fade */
+.bird-card--discover.bird-card--spotted .bird-card-face {
+  opacity: 1;
+}
+
+/* Share button + sighting bottom row */
+.bird-card-sighting-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  gap: 8px;
+}
+
+.bird-card-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1.5px solid var(--tan);
+  background: var(--parchment-dark);
+  color: var(--ink-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.bird-card-share-btn:hover:not(:disabled) {
+  background: var(--parchment-shadow);
+  color: var(--ink);
+  border-color: var(--brown-mid);
+}
+
+.bird-card-share-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Back face ──────────────────────────────────────── */
+
+.bird-card-back {
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  background: #FDFAF4;
+}
+
+.bird-card-back-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 8px;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tan-light) transparent;
+}
+
+/* Back header: name/sci + thumbnail */
+.bird-card-back-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--tan-light);
+}
+
+.bird-card-back-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.bird-card-back-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--brown-dark);
+  margin: 0 0 2px;
+  line-height: 1.25;
+}
+
+.bird-card-back-sci {
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.bird-card-back-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1.5px solid var(--tan);
+  flex-shrink: 0;
+}
+
+/* Tags row */
+.bird-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.bird-card-tag {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: var(--parchment-shadow);
+  color: var(--brown-mid);
+  border: 1px solid var(--tan-light);
+}
+
+.bird-card-tag--season {
+  background: rgba(107, 143, 74, 0.1);
+  color: var(--forest-green-dk);
+  border-color: rgba(107, 143, 74, 0.2);
+}
+
+/* Flavor text */
+.bird-card-back-description {
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--ink-light);
+  margin: 0 0 10px;
+}
+
+/* Stats grid (2×2) */
+.bird-card-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.bird-card-stat-cell {
+  background: var(--parchment-dark);
+  border: 1px solid var(--tan-light);
+  border-radius: 7px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bird-card-stat-cell--wide {
+  /* no extra styles needed, occupies one cell */
+}
+
+.bird-card-stat-main {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--brown-dark);
+  line-height: 1.2;
+}
+
+.bird-card-stat-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+}
+
+.bird-card-stat-sub {
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  line-height: 1.3;
+}
+
+/* IUCN badge */
+.bird-card-iucn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--iucn-color, var(--forest-green-dk));
+  letter-spacing: 0.04em;
+}
+
+.bird-card-iucn-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--iucn-color, var(--forest-green-dk));
+  flex-shrink: 0;
+}
+
+/* Generic section */
+.bird-card-section {
+  margin-bottom: 9px;
+}
+
+.bird-card-section-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--forest-green-dk);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 3px;
+}
+
+.bird-card-section-text {
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--ink-light);
+  margin: 0;
+}
+
+/* Fun facts list */
+.bird-card-facts {
+  padding-left: 13px;
+  margin: 0;
+}
+
+.bird-card-facts li {
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: var(--ink-light);
+  margin-bottom: 4px;
+}
+
+/* Habitat + Diet two-col */
+.bird-card-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Audio row */
+.bird-card-audio {
+  margin-bottom: 8px;
+}
+
+.bird-card-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--tan);
+  background: var(--parchment-dark);
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  cursor: not-allowed;
+  opacity: 0.55;
+  font-family: inherit;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.bird-card-waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 16px;
+  flex: 1;
+}
+
+.bird-card-waveform-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--tan);
+  min-height: 3px;
+}
+
+.bird-card-soon {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--tan-light);
+  color: var(--brown-mid);
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin-left: auto;
+}
+
+/* Bottom action links */
+.bird-card-back-actions {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.bird-card-action-link {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--tan-light);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  cursor: not-allowed;
+  opacity: 0.5;
+  font-family: inherit;
+  text-align: center;
+}
+
+/* Sighting divider */
+.bird-card-sighting-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+  color: var(--brown-mid);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bird-card-sighting-divider::before,
+.bird-card-sighting-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--tan) 0, var(--tan) 4px, transparent 4px, transparent 8px);
+}
+
+/* Sighting section */
+.bird-card-sighting {
+  background: rgba(200, 184, 145, 0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+}
+
+.bird-card-sighting-row {
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bird-card-sighting-notes {
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin: 4px 0;
+  line-height: 1.45;
+}
+
+.bird-card-sighting-photo {
+  width: 100%;
+  border-radius: 6px;
+  margin-top: 6px;
+  object-fit: cover;
+  max-height: 80px;
+}
+
+.bird-card-spotted-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px 3px 6px;
+  border-radius: 100px;
+  background: var(--forest-green-dk);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+}
+
+/* Back face flip-back button */
+.bird-card-back-flip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--tan-light);
+  color: var(--ink-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  width: 100%;
+}
+
+.bird-card-back-flip:hover {
+  background: rgba(107, 143, 74, 0.07);
+  color: var(--forest-green-dk);
+}
+
+/* Empty / partial state */
+.bird-card-back-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0 8px;
+  gap: 12px;
+}
+
+.bird-card-back-empty-note {
+  font-size: 0.73rem;
+  color: var(--tan);
+  font-style: italic;
+  margin: auto 0 0;
+  padding-top: 8px;
+}
