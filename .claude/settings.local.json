@@ -21,7 +21,9 @@
       "Bash(find /Users/danielbeckerman/Projects/birddex -maxdepth 1 -name .env*)",
       "Bash(ls /Users/danielbeckerman/Projects/birddex/.env*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep \"\\\\.env$\")",
+      "Bash(git commit:*)"
     ]
   }
 }
