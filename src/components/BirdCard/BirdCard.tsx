@@ -354,7 +354,21 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
                     </div>
                   </>
                 )}
-                <p className="bird-card-back-empty-note">Full field guide entry coming soon.</p>
+                <div className="bird-card-section">
+                  <h4 className="bird-card-section-title">Classification</h4>
+                  <p className="bird-card-section-text">
+                    {bird.familyComName && <><strong>{bird.familyComName}</strong><br /></>}
+                    {bird.order && <span style={{ color: 'var(--ink-muted)' }}>Order: {bird.order}</span>}
+                  </p>
+                </div>
+                {bird.observationCount != null && (
+                  <div className="bird-card-section">
+                    <h4 className="bird-card-section-title">Local Frequency</h4>
+                    <p className="bird-card-section-text">
+                      Observed {bird.observationCount} time{bird.observationCount !== 1 ? 's' : ''} in your area recently.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

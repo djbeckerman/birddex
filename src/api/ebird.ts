@@ -2,11 +2,9 @@ import axios from 'axios';
 import type { Bird, EBirdObservation } from '../types/bird';
 
 const EBIRD_BASE = 'https://api.ebird.org/v2';
-const LOCAL_BIRDS_CACHE_KEY = 'birddex-local-birds-v2';
+const LOCAL_BIRDS_CACHE_PREFIX = 'birddex-local-birds-v2';
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-
-/** Santa Monica / West LA location */
-const LOCATION = { lat: 34.0195, lng: -118.4912, distKm: 50 };
+const DIST_KM = 50;
 
 const ebirdClient = axios.create({
   baseURL: EBIRD_BASE,
@@ -16,17 +14,20 @@ const ebirdClient = axios.create({
 });
 
 /**
- * Fetch locally relevant bird species near Santa Monica.
+ * Fetch locally relevant bird species near the given coordinates.
  * Pulls recent observations (30-day window, 50km radius), aggregates by species,
  * and ranks by observation frequency. Returns ~80-150 species typical for the area.
  *
  * Falls back to a hardcoded list of 30 common coastal SoCal species if the API
  * is unavailable (e.g., missing API key, network error).
  */
-export async function fetchLocalBirds(): Promise<Bird[]> {
+export async function fetchLocalBirds(lat: number, lng: number): Promise<Bird[]> {
+  // Cache key includes rounded coords so different locations get separate caches
+  const cacheKey = `${LOCAL_BIRDS_CACHE_PREFIX}-${lat.toFixed(1)}-${lng.toFixed(1)}`;
+
   // Check session cache
   try {
-    const cached = sessionStorage.getItem(LOCAL_BIRDS_CACHE_KEY);
+    const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       const { data, timestamp } = JSON.parse(cached) as { data: Bird[]; timestamp: number };
       if (Date.now() - timestamp < CACHE_TTL_MS) return data;
@@ -38,9 +39,9 @@ export async function fetchLocalBirds(): Promise<Bird[]> {
   try {
     const resp = await ebirdClient.get<EBirdObservation[]>('/data/obs/geo/recent', {
       params: {
-        lat: LOCATION.lat,
-        lng: LOCATION.lng,
-        dist: LOCATION.distKm,
+        lat,
+        lng,
+        dist: DIST_KM,
         back: 30,
         maxResults: 10000,
       },
@@ -81,7 +82,7 @@ export async function fetchLocalBirds(): Promise<Bird[]> {
 
     try {
       sessionStorage.setItem(
-        LOCAL_BIRDS_CACHE_KEY,
+        cacheKey,
         JSON.stringify({ data: result, timestamp: Date.now() })
       );
     } catch {

@@ -1,0 +1,160 @@
+.inv-root {
+  min-height: 100vh;
+  background: var(--parchment, #F5F0E6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top, 24px)) 20px max(24px, env(safe-area-inset-bottom, 24px));
+  font-family: 'Inter', sans-serif;
+}
+
+.inv-loading {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inv-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* ── Brand ──────────────────────────────────────────────────── */
+
+.inv-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+  color: var(--ink-dark, #2c1f0e);
+}
+
+.inv-brand-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ── Avatar ─────────────────────────────────────────────────── */
+
+.inv-avatar-wrap {
+  margin-bottom: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--inv-glow, #c8a050) 35%, transparent);
+}
+
+.inv-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid color-mix(in srgb, var(--inv-glow, #c8a050) 60%, #c8a050);
+  display: block;
+}
+
+.inv-avatar--empty {
+  background: color-mix(in srgb, var(--inv-glow, #c8a050) 14%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--inv-glow, #c8a050) 70%, #8b6a30);
+}
+
+.inv-spirit-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--inv-glow, #c8a050) 80%, #5a3e0a);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+}
+
+/* ── Copy ────────────────────────────────────────────────────── */
+
+.inv-heading {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.3rem, 5vw, 1.6rem);
+  font-weight: 700;
+  color: var(--ink-dark, #2c1f0e);
+  text-align: center;
+  margin: 0 0 10px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.inv-sub {
+  font-size: 0.88rem;
+  color: var(--ink-muted, #8a7155);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+
+.inv-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.16s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  margin-bottom: 8px;
+}
+
+.inv-btn--primary {
+  background: var(--ink-dark, #2c1f0e);
+  color: var(--parchment, #F5F0E6);
+}
+.inv-btn--primary:hover:not(:disabled) { background: #1a110a; }
+.inv-btn--primary:active:not(:disabled) { transform: scale(0.98); }
+.inv-btn--primary:disabled { opacity: 0.45; cursor: default; }
+
+.inv-btn--secondary {
+  background: transparent;
+  color: var(--ink, #3c2f1e);
+  border: 1.5px solid var(--tan, #c8b08a);
+}
+.inv-btn--secondary:hover { background: var(--parchment-dark, #ede6d3); }
+
+/* ── Status chips ────────────────────────────────────────────── */
+
+.inv-status {
+  font-size: 0.88rem;
+  color: var(--ink-muted, #8a7155);
+  margin-bottom: 8px;
+  padding: 12px 0;
+}
+
+.inv-status--friends {
+  color: var(--forest-green-dk, #2e5c3a);
+}
+
+.inv-own-note {
+  font-size: 0.84rem;
+  color: var(--ink-muted, #8a7155);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.inv-footer {
+  font-size: 0.72rem;
+  color: var(--tan, #c8b08a);
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.inv-muted {
+  font-size: 0.88rem;
+  color: var(--ink-muted, #8a7155);
+}

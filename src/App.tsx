@@ -14,8 +14,11 @@ import { CollectionPage } from './pages/Collection/CollectionPage';
 import { DiscoverPage } from './pages/Discover/DiscoverPage';
 import { IdentifyPage } from './pages/Identify/IdentifyPage';
 import { FriendsPage } from './pages/Friends/FriendsPage';
+import { ProfilePage } from './pages/Profile/ProfilePage';
+import { InvitePage } from './pages/Invite/InvitePage';
 import { useBirdStore } from './store/useBirdStore';
 import { useAuthStore } from './store/useAuthStore';
+import { useLocationStore } from './store/useLocationStore';
 import { supabase } from './lib/supabase';
 import * as sightingsService from './services/sightingsService';
 import type { Bird } from './types/bird';
@@ -44,10 +47,11 @@ function AnimatedRoutes() {
         style={{ flex: 1, minWidth: 0 }}
       >
         <Routes location={location}>
-          <Route path="/"         element={<CollectionPage />} />
-          <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/identify" element={<IdentifyPage />} />
-          <Route path="/friends"  element={<FriendsPage />} />
+          <Route path="/"                    element={<CollectionPage />} />
+          <Route path="/discover"            element={<DiscoverPage />} />
+          <Route path="/identify"            element={<IdentifyPage />} />
+          <Route path="/friends"             element={<FriendsPage />} />
+          <Route path="/profile/:username"   element={<ProfilePage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -69,6 +73,7 @@ function AppShell() {
     hasOnboarded, setHasOnboarded,
     hasSeenSpiritBird, setHasSeenSpiritBird,
     setSpiritBird,
+    spiritBirdCode,
     spottedBirds,
     allBirds,
     syncFromSupabase,
@@ -81,8 +86,16 @@ function AppShell() {
     fetchProfile,
   } = useAuthStore();
 
+  const checkAndRequest = useLocationStore((s) => s.checkAndRequest);
+
   const [phase, setPhase] = useState<AppPhase>('loading');
   const [onboardingLogBird, setOnboardingLogBird] = useState<Bird | null>(null);
+
+  // ── Location init — runs once on mount ──────────────────────
+  useEffect(() => {
+    checkAndRequest();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Dev reset helper ────────────────────────────────────────
   useEffect(() => {
@@ -117,6 +130,12 @@ function AppShell() {
     const userId = session.user.id;
 
     fetchProfile(userId).then((p) => {
+      // Sync spirit bird from Supabase — prevents quiz re-appearing on new devices
+      if (p?.spirit_bird_code) {
+        if (!hasSeenSpiritBird) setHasSeenSpiritBird(true);
+        if (!spiritBirdCode) setSpiritBird(p.spirit_bird_code, p.spirit_bird_photo_url ?? null);
+      }
+
       // If no username yet: profile setup (new sign-up)
       if (!p?.username) return; // phase will be set to 'profile-setup' by the phase effect
 
@@ -255,7 +274,12 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppShell />
+        <Routes>
+          {/* Invite page is public — accessible without auth or app shell */}
+          <Route path="/invite/:username" element={<InvitePage />} />
+          {/* Everything else goes through the phase machine */}
+          <Route path="/*" element={<AppShell />} />
+        </Routes>
       </BrowserRouter>
     </QueryClientProvider>
   );

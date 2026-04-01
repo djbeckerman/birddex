@@ -83,7 +83,6 @@ export function IdentifyPage() {
         {screen === 'home' && (
           <HomeScreen
             key="home"
-            onSelectSound={() => setScreen('sound')}
             onSelectPhoto={() => setScreen('photo')}
           />
         )}
@@ -137,10 +136,8 @@ export function IdentifyPage() {
 // ── Home screen — two method cards ───────────────────────────────────────────
 
 function HomeScreen({
-  onSelectSound,
   onSelectPhoto,
 }: {
-  onSelectSound: () => void;
   onSelectPhoto: () => void;
 }) {
   return (
@@ -855,9 +852,23 @@ function IdentifyMatchCard({
             </>
           )}
           {!content && !loadingContent && (
-            <p className="identify-match-guide-loading">
-              No field guide entry yet for this species.
-            </p>
+            <div className="identify-match-guide-basic">
+              {match.funFact && (
+                <p className="identify-match-guide-desc" style={{ fontStyle: 'italic' }}>
+                  {match.funFact}
+                </p>
+              )}
+              {localBird && (localBird.familyComName || localBird.order) && (
+                <p className="identify-match-guide-loading" style={{ marginTop: match.funFact ? 8 : 0 }}>
+                  {[localBird.familyComName && `Family: ${localBird.familyComName}`, localBird.order && `Order: ${localBird.order}`].filter(Boolean).join(' · ')}
+                </p>
+              )}
+              {!match.funFact && !localBird && (
+                <p className="identify-match-guide-loading">
+                  {match.commonName} — {match.scientificName}
+                </p>
+              )}
+            </div>
           )}
           <button
             className="identify-this-is-it-btn identify-this-is-it-btn--wide"

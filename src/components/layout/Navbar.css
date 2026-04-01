@@ -49,6 +49,74 @@
   font-style: italic;
 }
 
+.nb-area-label--btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nb-area-label--btn:hover {
+  background: var(--tan-light);
+  color: var(--ink);
+  border-color: var(--tan);
+}
+
+/* ── Location permission banner ────────────────────────── */
+.nb-location-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 20px;
+  background: color-mix(in srgb, var(--forest-green) 10%, var(--parchment));
+  border-bottom: 1px solid color-mix(in srgb, var(--forest-green) 20%, transparent);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+
+.nb-location-banner svg {
+  color: var(--forest-green);
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+}
+
+.nb-location-banner-btn {
+  margin-left: 4px;
+  padding: 3px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--forest-green);
+  background: transparent;
+  color: var(--forest-green-dk);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.nb-location-banner-btn:hover {
+  background: var(--forest-green);
+  color: #fff;
+}
+
+.nb-location-banner-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
 .nb-stats {
   display: flex;
   align-items: center;
@@ -217,7 +285,7 @@
   /* Hide tab bar on mobile — BottomNav takes over */
   .nb-tabs { display: none; }
   .nb-header-top { padding: 10px 14px 10px; }
-  .nb-area-label { display: none; }
+  .nb-area-label { font-size: 0.68rem; padding: 2px 6px; }
   .nb-stats { gap: 10px; }
   .nb-stat { font-size: 0.72rem; }
   .nb-user-name { font-size: 0.75rem; }

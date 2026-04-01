@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useBirdStore } from '../../store/useBirdStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useLocationStore } from '../../store/useLocationStore';
 import { SPIRIT_BIRDS } from '../../data/spiritBirds';
+import { LocationModal } from '../LocationModal/LocationModal';
 import './Navbar.css';
 
 const TABS = [
@@ -20,6 +23,12 @@ export function Navbar() {
 
   const profile  = useAuthStore((s) => s.profile);
   const signOut  = useAuthStore((s) => s.signOut);
+
+  const locationLabel   = useLocationStore((s) => s.locationLabel);
+  const permissionState = useLocationStore((s) => s.permissionState);
+  const requestLocation = useLocationStore((s) => s.requestLocation);
+
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   const spiritBird = spiritBirdCode
     ? SPIRIT_BIRDS.find((b) => b.speciesCode === spiritBirdCode) ?? null
@@ -62,9 +71,14 @@ export function Navbar() {
             </div>
           )}
 
-          {totalBirds > 0 && (
-            <span className="nb-area-label">Santa Monica · LA Coast</span>
-          )}
+          <button
+            className="nb-area-label nb-area-label--btn"
+            onClick={() => setShowLocationModal(true)}
+            title="Change location"
+          >
+            {locationLabel}
+            <PinIcon />
+          </button>
         </div>
 
         {/* User identity + sign-out */}
@@ -104,6 +118,20 @@ export function Navbar() {
         </div>
       </div>
 
+      {/* Location permission banner — shown when browser hasn't been asked yet */}
+      {permissionState === 'unknown' && (
+        <div className="nb-location-banner">
+          <PinIcon />
+          <span>BirdDex uses your location to show birds nearby.</span>
+          <button className="nb-location-banner-btn" onClick={() => requestLocation()}>
+            Allow
+          </button>
+          <button className="nb-location-banner-dismiss" onClick={() => useLocationStore.getState().useFallback()} aria-label="Dismiss">
+            ✕
+          </button>
+        </div>
+      )}
+
       <nav className="nb-tabs" role="navigation" aria-label="Main navigation">
         {TABS.map(({ to, label, end }) => (
           <NavLink
@@ -116,7 +144,20 @@ export function Navbar() {
           </NavLink>
         ))}
       </nav>
+
+      {showLocationModal && (
+        <LocationModal onClose={() => setShowLocationModal(false)} />
+      )}
     </header>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="2"/>
+    </svg>
   );
 }
 
