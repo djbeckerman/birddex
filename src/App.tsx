@@ -21,6 +21,7 @@ import { useAuthStore } from './store/useAuthStore';
 import { useLocationStore } from './store/useLocationStore';
 import { supabase } from './lib/supabase';
 import * as sightingsService from './services/sightingsService';
+import { track, identifyUser } from './lib/posthog';
 import type { Bird } from './types/bird';
 
 const queryClient = new QueryClient({
@@ -93,6 +94,7 @@ function AppShell() {
 
   // ── Location init — runs once on mount ──────────────────────
   useEffect(() => {
+    track('app_opened');
     checkAndRequest();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -138,6 +140,13 @@ function AppShell() {
 
       // If no username yet: profile setup (new sign-up)
       if (!p?.username) return; // phase will be set to 'profile-setup' by the phase effect
+
+      // Identify user in PostHog
+      identifyUser(userId, {
+        display_name: p.display_name ?? null,
+        username: p.username,
+        spirit_bird: p.spirit_bird_code ?? null,
+      });
 
       // Migrate any local sightings that haven't been synced yet
       const localCount = Object.keys(spottedBirds).length;

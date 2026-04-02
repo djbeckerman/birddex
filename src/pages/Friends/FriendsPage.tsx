@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
 import { SPIRIT_BIRDS } from '../../data/spiritBirds';
+import { track } from '../../lib/posthog';
 import {
   getFriends,
   getPendingRequests,
@@ -198,6 +199,7 @@ export function FriendsPage() {
       if (result.error) {
         setAddResult({ type: 'error', msg: result.error });
       } else {
+        track('friend_request_sent');
         setAddResult({ type: 'success', msg: 'Friend request sent!' });
         setAddUsername('');
         queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
@@ -226,6 +228,7 @@ export function FriendsPage() {
 
   function handleShare() {
     if (!inviteUrl) return;
+    track('friend_invited');
     if (navigator.share) {
       navigator.share({ title: 'Join me on BirdDex', url: inviteUrl }).catch(() => handleCopy());
     } else {

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { Bird, SpottedEntry } from '../types/bird';
 import { supabase } from '../lib/supabase';
 import * as sightingsService from '../services/sightingsService';
+import { track } from '../lib/posthog';
 
 const PHOTO_CACHE_MAX = 5000;
 
@@ -72,11 +73,14 @@ export const useBirdStore = create<BirdState>()(
 
       spotBird: (speciesCode, meta = {}) => {
         const entry: SpottedEntry = { spottedAt: new Date().toISOString(), ...meta };
+        const isFirst = Object.keys(get().spottedBirds).length === 0;
         set((s) => ({ spottedBirds: { ...s.spottedBirds, [speciesCode]: entry } }));
         // Non-blocking Supabase sync
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (!session) return;
           const bird = get().allBirds.find((b) => b.speciesCode === speciesCode);
+          track('bird_spotted', { species: bird?.comName ?? speciesCode, rarity: bird?.observationCount });
+          if (isFirst) track('first_bird_spotted', { species: bird?.comName ?? speciesCode });
           sightingsService
             .upsertSighting(session.user.id, speciesCode, bird?.comName ?? '', bird?.sciName ?? '', entry)
             .catch(console.error);

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
+import { track } from '../../lib/posthog';
 import './AuthPage.css';
 
 type Mode = 'signin' | 'signup';
@@ -20,14 +21,18 @@ export function AuthPage({ onSignIn, onSignUp }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
 
+  useEffect(() => { track('signup_page_viewed'); }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     if (mode === 'signup') {
+      track('signup_attempted');
       const { error: err } = await supabase.auth.signUp({ email, password });
       if (err) { setError(err.message); setLoading(false); return; }
+      track('signup_completed');
       onSignUp();
     } else {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });

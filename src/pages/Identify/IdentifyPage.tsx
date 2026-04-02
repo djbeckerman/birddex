@@ -10,6 +10,7 @@ import { identifyBySound, identifyByPhoto, type IdentifyMatch } from '../../api/
 import { getBirdContent } from '../../services/birdContent';
 import { getPositionOnce, formatCoordsLabel } from '../../utils/gps';
 import { getRarityTier, RARITY_META } from '../../utils/rarity';
+import { track } from '../../lib/posthog';
 import type { BirdWithMeta, BirdContent } from '../../types/bird';
 import './IdentifyPage.css';
 
@@ -515,6 +516,7 @@ function PhotoFlow({
 
   const handleAnalyze = async () => {
     if (!selectedFile) return;
+    track('photo_id_used');
     setState('analyzing');
     try {
       const matches = await identifyByPhoto(selectedFile, coords?.lat, coords?.lng);

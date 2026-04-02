@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '../../store/useAuthStore';
 import { SPIRIT_BIRDS } from '../../data/spiritBirds';
 import * as friendsService from '../../services/friendsService';
+import { track } from '../../lib/posthog';
 import './InvitePage.css';
 
 const APP_URL = 'https://birddex-one.vercel.app';
@@ -38,7 +39,8 @@ export function InvitePage() {
 
   const addFriend = useMutation({
     mutationFn: () => friendsService.sendFriendRequest(session!.user.id, username!),
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (!result.error) track('friend_request_sent');
       qc.invalidateQueries({ queryKey: ['friendship-status', session?.user.id, profile?.id] });
     },
   });

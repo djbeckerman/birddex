@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { useBirdStore } from '../../store/useBirdStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { track } from '../../lib/posthog';
 import './ProfileSetupPage.css';
 
 interface ProfileSetupPageProps {
@@ -58,6 +59,7 @@ export function ProfileSetupPage({ userId, onComplete }: ProfileSetupPageProps) 
 
     // Refresh profile in the auth store
     await fetchProfile(userId);
+    track('profile_setup_completed');
     setLoading(false);
     onComplete();
   };

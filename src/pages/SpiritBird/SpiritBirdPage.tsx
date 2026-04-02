@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QUIZ_QUESTIONS, computeSpiritBird } from '../../data/spiritBirds';
 import type { SpiritBirdDef } from '../../data/spiritBirds';
 import { fetchBirdPhoto } from '../../api/inaturalist';
+import { track } from '../../lib/posthog';
 import './SpiritBirdPage.css';
 
 const BIOMES = ['coastal', 'mountain', 'desert', 'forest'] as const;
@@ -188,6 +189,7 @@ export function SpiritBirdPage({ onComplete }: Props) {
     stopAudio(true);
 
     const next = [...answers, idx];
+    track(`spirit_bird_scene_${next.length}_completed`);
     setTimeout(() => {
       if (next.length >= QUIZ_QUESTIONS.length) {
         setAnswers(next);
@@ -201,6 +203,7 @@ export function SpiritBirdPage({ onComplete }: Props) {
 
   const handleBeginJourney = () => {
     if (!result) return;
+    track('spirit_bird_completed', { bird_name: result.comName });
     setExiting(true);
     setTimeout(() => onComplete(result.speciesCode, photoUrl), 700);
   };
@@ -355,7 +358,7 @@ export function SpiritBirdPage({ onComplete }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
-            onClick={() => setPhase('scene')}
+            onClick={() => { track('spirit_bird_started'); setPhase('scene'); }}
           >
             <div className="sb-drifting-feather" aria-hidden="true"><FeatherSVG /></div>
 
