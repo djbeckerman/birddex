@@ -327,6 +327,12 @@ function SoundFlow({
       recorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         console.log('[BirdDex] Recording stopped. Blob size:', blob.size, 'type:', blob.type);
+        if (blob.size < 4096) {
+          // Too short to contain usable audio — MediaRecorder hadn't collected chunks yet
+          setErrorMsg('Recording was too short. Hold the button for at least 3 seconds.');
+          setState('error');
+          return;
+        }
         await runAnalysis(blob);
       };
 
@@ -389,9 +395,13 @@ function SoundFlow({
       );
       setResults(withPhotos);
       setState('results');
-    } catch {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isNetwork = msg.includes('fetch') || msg.includes('network') || msg.includes('Failed to fetch');
       setErrorMsg(
-        "Couldn't reach the sound analysis server. Make sure the BirdNET server is running (see server/README.md).",
+        isNetwork
+          ? "Couldn't reach the sound analysis server. Check your connection and try again."
+          : `Analysis failed: ${msg}`,
       );
       setState('error');
     }
