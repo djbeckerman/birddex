@@ -2,12 +2,14 @@
 # ffmpeg is required by librosa (used by birdnetlib) to decode .webm audio
 # from browsers. Without it, BirdNET silently returns empty results.
 
-# Declaring providers explicitly is required when overriding phases —
-# without this, Nixpacks skips Python detection and python/pip aren't installed.
+# providers = ["python"] lets Nixpacks manage Python + pip + virtualenv.
+# Do NOT also pin python39 in nixPkgs — that creates a second Python install
+# that doesn't share the venv, causing pip installs to land in the wrong place.
+# ffmpeg-full is a system binary so it's safe in nixPkgs alongside the provider.
 providers = ["python"]
 
 [phases.setup]
-nixPkgs = ["python39", "ffmpeg-full"]
+nixPkgs = ["ffmpeg-full"]
 
 [start]
 cmd = "uvicorn server:app --host 0.0.0.0 --port $PORT"
