@@ -8,3 +8,6 @@ tflite-runtime>=2.14.0
 # soundfile: librosa's audio I/O backend (requires libsndfile1 system lib, see Dockerfile)
 librosa>=0.10.0
 soundfile>=0.12.1
+# tflite-runtime was compiled against NumPy 1.x — NumPy 2.x breaks it at runtime
+# with "A module that was compiled using NumPy 1.x cannot be run in NumPy 2.x"
+numpy<2
