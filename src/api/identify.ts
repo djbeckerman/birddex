@@ -134,7 +134,3 @@ function normalizeMediaType(type: string): 'image/jpeg' | 'image/png' | 'image/g
   return 'image/jpeg';
 }
 
-function isoWeek(d: Date): number {
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  return Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
-}
