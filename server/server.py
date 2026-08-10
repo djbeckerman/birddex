@@ -4,7 +4,7 @@ Accepts audio uploads and returns species predictions using BirdNET-Analyzer.
 """
 import os
 import tempfile
-from datetime import date
+from datetime import date, datetime
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,13 +48,9 @@ async def identify_birds(
     audio: UploadFile = File(...),
     lat: float = Form(34.0195),
     lng: float = Form(-118.4912),
-    week: int = Form(None),
 ):
     if not BIRDNET_AVAILABLE or analyzer is None:
-        return {"detections": [], "error": "BirdNET not available. Run: pip install birdnetlib"}
-
-    if week is None:
-        week = date.today().isocalendar()[1]
+        return {"detections": [], "error": "BirdNET not available"}
 
     # Write upload to a temp file
     suffix = os.path.splitext(audio.filename or "recording")[1] or ".webm"
@@ -66,9 +62,9 @@ async def identify_birds(
         recording = Recording(
             analyzer,
             tmp_path,
+            date=datetime.now(),  # birdnetlib converts to week_48 internally
             lat=lat,
             lon=lng,
-            week=week,
             sensitivity=1.0,
             overlap=0.0,
         )

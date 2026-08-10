@@ -25,7 +25,7 @@ export async function identifyBySound(
   form.append('audio', audioBlob, 'recording.webm');
   form.append('lat', String(lat));
   form.append('lng', String(lng));
-  form.append('week', String(isoWeek(new Date())));
+  // week removed — server now passes date= to birdnetlib which converts internally
 
   const res = await fetch(`${serverUrl}/identify`, { method: 'POST', body: form });
   if (!res.ok) throw new Error(`BirdNET server error: ${res.status}`);
