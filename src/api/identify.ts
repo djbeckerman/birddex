@@ -30,8 +30,13 @@ export async function identifyBySound(
   const res = await fetch(`${serverUrl}/identify`, { method: 'POST', body: form });
   if (!res.ok) throw new Error(`BirdNET server error: ${res.status}`);
 
-  const data: { detections?: Array<{ common_name: string; scientific_name: string; confidence: number }> } =
-    await res.json();
+  const data: {
+    detections?: Array<{ common_name: string; scientific_name: string; confidence: number }>;
+    error?: string;
+  } = await res.json();
+
+  // Server-side BirdNET error (e.g. ffmpeg missing, librosa decode failure)
+  if (data.error) throw new Error(`BirdNET: ${data.error}`);
 
   return (data.detections ?? []).map((d) => ({
     commonName: d.common_name,

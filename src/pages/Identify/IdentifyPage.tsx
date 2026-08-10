@@ -84,6 +84,7 @@ export function IdentifyPage() {
         {screen === 'home' && (
           <HomeScreen
             key="home"
+            onSelectSound={() => setScreen('sound')}
             onSelectPhoto={() => setScreen('photo')}
           />
         )}
@@ -137,8 +138,10 @@ export function IdentifyPage() {
 // ── Home screen — two method cards ───────────────────────────────────────────
 
 function HomeScreen({
+  onSelectSound,
   onSelectPhoto,
 }: {
+  onSelectSound: () => void;
   onSelectPhoto: () => void;
 }) {
   return (
@@ -155,7 +158,7 @@ function HomeScreen({
       </div>
 
       <div className="identify-cards">
-        <div className="identify-method-card identify-method-card--disabled" aria-disabled="true">
+        <button className="identify-method-card" onClick={onSelectSound}>
           <div className="identify-method-icon identify-method-icon--sound">
             <MicIcon size={28} />
           </div>
@@ -163,8 +166,8 @@ function HomeScreen({
             <span className="identify-method-name">What's singing?</span>
             <span className="identify-method-sub">Record bird sounds nearby</span>
           </div>
-          <span className="identify-coming-soon-badge">Coming Soon</span>
-        </div>
+          <ChevronIcon />
+        </button>
 
         <button className="identify-method-card" onClick={onSelectPhoto}>
           <div className="identify-method-icon identify-method-icon--photo">
@@ -179,7 +182,7 @@ function HomeScreen({
       </div>
 
       <p className="identify-home-hint">
-        Powered by Claude AI vision
+        Powered by BirdNET · Claude AI vision
       </p>
     </motion.div>
   );

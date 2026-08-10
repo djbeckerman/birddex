@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { fetchBirdPhoto } from '../../api/inaturalist';
+import { fetchBirdCall } from '../../api/xenocanto';
+import type { XCRecording } from '../../api/xenocanto';
 import { useBirdStore } from '../../store/useBirdStore';
 import { getBirdContent } from '../../services/birdContent';
 import { getRarityTier, RARITY_META } from '../../utils/rarity';
@@ -267,23 +269,8 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
                   </div>
                 </div>
 
-                {/* Audio placeholder */}
-                <div className="bird-card-audio">
-                  <button className="bird-card-audio-btn" disabled title="Coming soon">
-                    <PlayIcon />
-                    <div className="bird-card-waveform">
-                      {Array.from({ length: 12 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="bird-card-waveform-bar"
-                          style={{ height: `${4 + Math.sin(i * 0.9) * 4 + Math.cos(i * 1.3) * 3}px` }}
-                        />
-                      ))}
-                    </div>
-                    <span>Hear call</span>
-                    <span className="bird-card-soon">soon</span>
-                  </button>
-                </div>
+                {/* Call audio player */}
+                <CallPlayer sciName={bird.sciName} active={isFlipped} />
 
                 {/* Bottom action links */}
                 <div className="bird-card-back-actions">
@@ -379,6 +366,74 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+/* ── Call Player ─────────────────────────────────────────── */
+function CallPlayer({ sciName, active }: { sciName: string; active: boolean }) {
+  const [recording, setRecording] = useState<XCRecording | null | 'loading'>('loading');
+  const [playing, setPlaying]     = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Fetch once when card flips open
+  useEffect(() => {
+    if (!active) return;
+    let cancelled = false;
+    fetchBirdCall(sciName).then((r) => {
+      if (!cancelled) setRecording(r);
+    });
+    return () => { cancelled = true; };
+  }, [sciName, active]);
+
+  // Stop audio when card flips away
+  useEffect(() => {
+    if (!active) {
+      audioRef.current?.pause();
+      setPlaying(false);
+    }
+  }, [active]);
+
+  const toggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else {
+      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+  };
+
+  if (recording === 'loading' || recording === null) {
+    return null; // no player if unavailable or still loading
+  }
+
+  return (
+    <div className="bird-card-audio">
+      <audio
+        ref={audioRef}
+        src={recording.audioUrl}
+        preload="none"
+        onEnded={() => setPlaying(false)}
+        onPause={() => setPlaying(false)}
+      />
+      <button className="bird-card-audio-btn bird-card-audio-btn--active" onClick={toggle}>
+        {playing ? <PauseIcon /> : <PlayIcon />}
+        <div className="bird-card-waveform">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className={`bird-card-waveform-bar${playing ? ' bird-card-waveform-bar--playing' : ''}`}
+              style={{ height: `${4 + Math.sin(i * 0.9) * 4 + Math.cos(i * 1.3) * 3}px`, animationDelay: `${i * 60}ms` }}
+            />
+          ))}
+        </div>
+        <span>{playing ? 'Playing…' : 'Hear call'}</span>
+      </button>
+      <p className="bird-card-audio-credit">
+        © <a href={recording.xcUrl} target="_blank" rel="noopener noreferrer">{recording.recordist}</a> · <a href="https://xeno-canto.org" target="_blank" rel="noopener noreferrer">Xeno-canto</a> · <a href={recording.licenseUrl} target="_blank" rel="noopener noreferrer">CC</a>
+      </p>
+    </div>
   );
 }
 
@@ -529,6 +584,9 @@ function CalIcon() {
 }
 function PlayIcon() {
   return <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 4l4 2-4 2V4z" fill="currentColor"/></svg>;
+}
+function PauseIcon() {
+  return <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2"/><rect x="4" y="3.5" width="1.5" height="5" rx="0.5" fill="currentColor"/><rect x="6.5" y="3.5" width="1.5" height="5" rx="0.5" fill="currentColor"/></svg>;
 }
 function ShareIcon() {
   return <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="11" cy="3" r="1.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M4.3 6.25L9.7 3.75M4.3 7.75l5.4 2.5" stroke="currentColor" strokeWidth="1.2"/></svg>;

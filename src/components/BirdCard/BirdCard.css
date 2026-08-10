@@ -527,7 +527,7 @@
 
 /* Audio row */
 .bird-card-audio {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .bird-card-audio-btn {
@@ -548,6 +548,18 @@
   justify-content: flex-start;
 }
 
+.bird-card-audio-btn--active {
+  cursor: pointer;
+  opacity: 1;
+  color: var(--ink);
+  border-color: var(--forest-green, #4a7c59);
+  background: rgba(74, 124, 89, 0.07);
+  transition: background 0.15s;
+}
+.bird-card-audio-btn--active:hover {
+  background: rgba(74, 124, 89, 0.13);
+}
+
 .bird-card-waveform {
   display: flex;
   align-items: center;
@@ -561,6 +573,30 @@
   border-radius: 2px;
   background: var(--tan);
   min-height: 3px;
+}
+
+@keyframes bc-wave {
+  0%, 100% { transform: scaleY(1); }
+  50%       { transform: scaleY(2.2); }
+}
+
+.bird-card-waveform-bar--playing {
+  background: var(--forest-green, #4a7c59);
+  animation: bc-wave 0.7s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.bird-card-audio-credit {
+  font-size: 0.58rem;
+  color: var(--ink-muted);
+  margin: 3px 0 0;
+  line-height: 1.4;
+}
+
+.bird-card-audio-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .bird-card-soon {

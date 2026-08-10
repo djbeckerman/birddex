@@ -2,3 +2,5 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9
 birdnetlib>=0.9.0
+# ffmpeg must also be installed on the system (brew install ffmpeg / apt install ffmpeg)
+# birdnetlib uses librosa which needs ffmpeg to decode webm/mp4 audio from browsers
