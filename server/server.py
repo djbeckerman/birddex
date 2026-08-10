@@ -13,9 +13,11 @@ try:
     from birdnetlib import Recording
     from birdnetlib.analyzer import Analyzer
     BIRDNET_AVAILABLE = True
-except ImportError:
+except Exception as e:
     BIRDNET_AVAILABLE = False
-    print("WARNING: birdnetlib not installed. Install it with: pip install birdnetlib")
+    import traceback
+    print(f"WARNING: birdnetlib import failed: {e}")
+    traceback.print_exc()
 
 app = FastAPI(title="BirdDex BirdNET Server", version="1.0.0")
 

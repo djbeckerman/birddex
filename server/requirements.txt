@@ -2,5 +2,9 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9
 birdnetlib>=0.9.0
-# ffmpeg must also be installed on the system (brew install ffmpeg / apt install ffmpeg)
+# tflite-runtime: birdnetlib bundles the .tflite model but NOT the inference engine.
+# It tries `import tflite_runtime` first, then falls back to tensorflow.
+# tflite-runtime is ~50MB vs tensorflow's ~500MB — use it on constrained hosts.
+tflite-runtime>=2.14.0
+# ffmpeg must also be installed on the system (see Dockerfile)
 # birdnetlib uses librosa which needs ffmpeg to decode webm/mp4 audio from browsers

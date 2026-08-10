@@ -1,7 +1,10 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
-# Install ffmpeg — required by librosa to decode .webm audio from browsers
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+# ffmpeg: required by librosa to decode .webm audio from browsers
+# libgomp1: required by tflite-runtime's native OpenMP extensions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ffmpeg \
+        libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
