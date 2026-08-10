@@ -1,0 +1,9 @@
+# Nixpacks build config for Railway
+# ffmpeg is required by librosa (used by birdnetlib) to decode .webm audio
+# from browsers. Without it, BirdNET silently returns empty results.
+
+[phases.setup]
+nixPkgs = ["ffmpeg-full"]
+
+[start]
+cmd = "uvicorn server:app --host 0.0.0.0 --port $PORT"
