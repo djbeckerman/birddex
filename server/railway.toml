@@ -1,9 +1,0 @@
-[build]
-builder = "nixpacks"
-
-[deploy]
-# Railway injects $PORT — uvicorn must bind to it, not hardcoded 5001
-startCommand = "uvicorn server:app --host 0.0.0.0 --port $PORT"
-healthcheckPath = "/health"
-healthcheckTimeout = 120  # birdnetlib downloads model weights on first start (~100MB, ~60-90s)
-restartPolicyType = "on_failure"
