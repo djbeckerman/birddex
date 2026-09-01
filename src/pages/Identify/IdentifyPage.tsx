@@ -20,7 +20,7 @@ type TopScreen = 'home' | 'sound' | 'photo';
 
 // ── Root page ─────────────────────────────────────────────────────────────────
 
-export function IdentifyPage() {
+export function IdentifyPage({ onClose }: { onClose: () => void }) {
   const [screen, setScreen] = useState<TopScreen>('home');
   const [confirmMatch, setConfirmMatch] = useState<IdentifyMatch | null>(null);
   const [caughtBird, setCaughtBird] = useState<BirdWithMeta | null>(null);
@@ -79,20 +79,28 @@ export function IdentifyPage() {
   };
 
   return (
-    <div className="identify-root">
+    <motion.div
+      className="identify-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="identify-root">
       <AnimatePresence mode="wait">
         {screen === 'home' && (
           <HomeScreen
             key="home"
             onSelectSound={() => setScreen('sound')}
             onSelectPhoto={() => setScreen('photo')}
+            onClose={onClose}
           />
         )}
         {screen === 'sound' && (
-          <SoundFlow key="sound" onBack={() => setScreen('home')} onMatch={handleMatch} />
+          <SoundFlow key="sound" onBack={() => setScreen('home')} onClose={onClose} onMatch={handleMatch} />
         )}
         {screen === 'photo' && (
-          <PhotoFlow key="photo" onBack={() => setScreen('home')} onMatch={handleMatch} />
+          <PhotoFlow key="photo" onBack={() => setScreen('home')} onClose={onClose} onMatch={handleMatch} />
         )}
       </AnimatePresence>
 
@@ -127,11 +135,15 @@ export function IdentifyPage() {
               setPostLog(false);
               setScreen('home');
             }}
-            onViewCollection={() => setPostLog(false)}
+            onViewCollection={() => {
+              setPostLog(false);
+              onClose();
+            }}
           />
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -140,9 +152,11 @@ export function IdentifyPage() {
 function HomeScreen({
   onSelectSound,
   onSelectPhoto,
+  onClose,
 }: {
   onSelectSound: () => void;
   onSelectPhoto: () => void;
+  onClose: () => void;
 }) {
   return (
     <motion.div
@@ -153,8 +167,13 @@ function HomeScreen({
       transition={{ duration: 0.22 }}
     >
       <div className="identify-home-header">
-        <h1 className="identify-home-title">Identify</h1>
-        <p className="identify-home-subtitle">What did you hear or see?</p>
+        <div>
+          <h1 className="identify-home-title">Identify</h1>
+          <p className="identify-home-subtitle">What did you hear or see?</p>
+        </div>
+        <button className="identify-close-btn" onClick={onClose} aria-label="Close">
+          <CloseIcon />
+        </button>
       </div>
 
       <div className="identify-cards">
@@ -194,9 +213,11 @@ type SoundState = 'requesting' | 'recording' | 'analyzing' | 'results' | 'empty'
 
 function SoundFlow({
   onBack,
+  onClose,
   onMatch,
 }: {
   onBack: () => void;
+  onClose: () => void;
   onMatch: (m: IdentifyMatch) => void;
 }) {
   const [state, setState] = useState<SoundState>('requesting');
@@ -428,6 +449,9 @@ function SoundFlow({
           <BackIcon /> Back
         </button>
         <h2 className="identify-flow-title">Sound ID</h2>
+        <button className="identify-close-btn" onClick={onClose} aria-label="Close">
+          <CloseIcon />
+        </button>
       </div>
 
       {state === 'requesting' && (
@@ -500,9 +524,11 @@ type PhotoState = 'picker' | 'previewing' | 'analyzing' | 'results' | 'empty' | 
 
 function PhotoFlow({
   onBack,
+  onClose,
   onMatch,
 }: {
   onBack: () => void;
+  onClose: () => void;
   onMatch: (m: IdentifyMatch) => void;
 }) {
   const [state, setState] = useState<PhotoState>('picker');
@@ -574,6 +600,9 @@ function PhotoFlow({
           <BackIcon /> Back
         </button>
         <h2 className="identify-flow-title">Photo ID</h2>
+        <button className="identify-close-btn" onClick={onClose} aria-label="Close">
+          <CloseIcon />
+        </button>
       </div>
 
       {state === 'picker' && (
@@ -1080,7 +1109,7 @@ function PostLogSheet({
             <MicIcon size={15} /> Identify another bird
           </button>
           <NavLink
-            to="/collection"
+            to="/"
             className="post-log-btn post-log-btn--secondary"
             onClick={onViewCollection}
           >
@@ -1183,6 +1212,14 @@ function BackIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

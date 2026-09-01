@@ -1,14 +1,16 @@
 import { NavLink } from 'react-router-dom';
+import { useUnseenPecks } from '../../hooks/useUnseenPecks';
 import './BottomNav.css';
 
 const TABS = [
   { to: '/',         label: 'My Birds',  end: true,  Icon: BookIcon      },
   { to: '/discover', label: 'Discover',  end: false, Icon: BinocularsIcon },
-  { to: '/identify', label: 'Identify',  end: false, Icon: SearchIcon     },
   { to: '/friends',  label: 'Friends',   end: false, Icon: PeopleIcon     },
 ];
 
 export function BottomNav() {
+  const unseenPecks = useUnseenPecks();
+
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
       {TABS.map(({ to, label, end, Icon }) => (
@@ -18,7 +20,12 @@ export function BottomNav() {
           end={end}
           className={({ isActive }) => `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`}
         >
-          <Icon />
+          <span className="bottom-nav-icon-wrap">
+            <Icon />
+            {to === '/friends' && unseenPecks > 0 && (
+              <span className="bottom-nav-badge" aria-label={`${unseenPecks} new pecks`} />
+            )}
+          </span>
           <span className="bottom-nav-label">{label}</span>
         </NavLink>
       ))}
@@ -46,15 +53,6 @@ function BinocularsIcon() {
   );
 }
 
-function SearchIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="6" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M14.5 14.5l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-      <path d="M8 10h4M10 8v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  );
-}
 
 function PeopleIcon() {
   return (

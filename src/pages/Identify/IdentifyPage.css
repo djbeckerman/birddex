@@ -1,11 +1,41 @@
 /* ── Root ──────────────────────────────────────────────────────────────────── */
 
+/* Identify is a full-screen overlay launched from Discover (or New Sighting's
+   "Help me identify it" path) rather than a routed page, so it takes over
+   the whole viewport — including the area behind the bottom nav — and is
+   closed with the × in its header instead of by switching tabs. */
+.identify-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: var(--parchment, #F5F0E6);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .identify-root {
   max-width: 680px;
   margin: 0 auto;
-  padding: 0 20px 60px;
-  min-height: calc(100vh - 64px);
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 20px calc(60px + env(safe-area-inset-bottom, 0px));
+  min-height: 100%;
 }
+
+.identify-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--tan);
+  background: var(--parchment-dark);
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.identify-close-btn:hover { background: var(--tan-light); color: var(--ink); }
 
 /* ── Home screen ───────────────────────────────────────────────────────────── */
 
@@ -14,6 +44,10 @@
 }
 
 .identify-home-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -155,6 +189,10 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 28px;
+}
+
+.identify-flow-header .identify-close-btn {
+  margin-left: auto;
 }
 
 .identify-back-btn {

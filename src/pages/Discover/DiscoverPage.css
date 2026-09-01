@@ -308,3 +308,37 @@
     width: 100%;
   }
 }
+
+/* ── Identify FAB ────────────────────────────────── */
+/* Floating trigger for the Identify overlay (photo/sound ID). Fixed
+   bottom-right, thumb-reachable; lifted clear of the bottom tab bar on
+   narrow viewports where that bar is visible. */
+.discover-identify-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--forest-green-dk, #4A6A32);
+  color: #FDFAF4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(44, 24, 16, 0.28);
+  z-index: 120;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.discover-identify-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(44, 24, 16, 0.34);
+}
+
+@media (max-width: 640px) {
+  .discover-identify-fab {
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 18px);
+  }
+}

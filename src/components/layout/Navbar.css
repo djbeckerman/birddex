@@ -295,3 +295,14 @@
 @media (max-width: 480px) {
   .nb-header-top { padding: 8px 14px 8px; }
 }
+
+.nb-tab-badge {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #C0392B;
+  border: 1.5px solid var(--tan-light);
+}

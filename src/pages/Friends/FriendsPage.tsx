@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -8,10 +8,12 @@ import {
   getFriends,
   getPendingRequests,
   getFriendActivity,
+  getRecentPecks,
+  markPecksSeen,
   sendFriendRequest,
   respondToRequest,
 } from '../../services/friendsService';
-import type { ActivityItem, FriendProfile, FriendRequest } from '../../services/friendsService';
+import type { ActivityItem, FriendProfile, FriendRequest, PeckWithSender } from '../../services/friendsService';
 import './FriendsPage.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -154,6 +156,26 @@ function ActivityRow({ item }: { item: ActivityItem }) {
   );
 }
 
+function PeckRow({ peck }: { peck: PeckWithSender }) {
+  const glow = getGlowColor(peck.sender.spirit_bird_code);
+  const name = peck.sender.display_name ?? peck.sender.username ?? 'Someone';
+  return (
+    <div className="fp-activity-item">
+      <SpiritAvatar
+        photoUrl={peck.sender.spirit_bird_photo_url}
+        name={name}
+        glowColor={glow}
+      />
+      <div className="fp-activity-body">
+        <span className="fp-activity-text">
+          <strong>{name}</strong> pecked you 🐦
+        </span>
+        <span className="fp-activity-time">{timeAgo(peck.created_at)}</span>
+      </div>
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function FriendsPage() {
@@ -189,6 +211,19 @@ export function FriendsPage() {
     queryFn: () => getFriendActivity(session!.user.id),
     enabled: !!session,
   });
+
+  const { data: pecks = [] } = useQuery<PeckWithSender[]>({
+    queryKey: ['pecks', session?.user.id],
+    queryFn: () => getRecentPecks(session!.user.id),
+    enabled: !!session,
+  });
+
+  // Visiting Friends clears the "someone pecked you" badge on the nav tab
+  useEffect(() => {
+    if (session) markPecksSeen(session.user.id).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['unseen-pecks', session.user.id] });
+    });
+  }, [session, queryClient]);
 
   // ── Mutations ──────────────────────────────────────────────────────────────
 
@@ -342,6 +377,17 @@ export function FriendsPage() {
       </div>
 
       {/* ── Activity feed ────────────────────────────────────────── */}
+      {pecks.length > 0 && (
+        <div className="fp-section">
+          <h2 className="fp-section-title">Pecks</h2>
+          <div className="fp-activity-list">
+            {pecks.map((peck) => (
+              <PeckRow key={peck.id} peck={peck} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {activity.length > 0 && (
         <div className="fp-section">
           <h2 className="fp-section-title">Recent Activity</h2>

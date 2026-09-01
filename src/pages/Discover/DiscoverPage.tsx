@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBirdCollection } from '../../hooks/useBirdCollection';
 import { useFilteredBirds } from '../../hooks/useFilteredBirds';
 import { useBirdStore } from '../../store/useBirdStore';
+import { useIdentifyStore } from '../../store/useIdentifyStore';
 import { BirdCard } from '../../components/BirdCard/BirdCard';
 import { CaughtAnimation } from '../../components/CaughtAnimation/CaughtAnimation';
 import { NewSightingModal } from '../../components/NewSightingModal/NewSightingModal';
@@ -159,6 +160,16 @@ export function DiscoverPage() {
         </>
       )}
 
+      {/* ── Identify — floating action button ─────── */}
+      <button
+        className="discover-identify-fab"
+        onClick={() => useIdentifyStore.getState().open()}
+        aria-label="Identify a bird by photo or sound"
+        title="Identify a bird"
+      >
+        <IdentifyFabIcon />
+      </button>
+
       {/* ── New Sighting Modal ─────────────────────── */}
       <AnimatePresence>
         {showLogModal && <NewSightingModal onClose={() => setShowLogModal(false)} />}
@@ -182,6 +193,15 @@ export function DiscoverPage() {
 function SearchIcon() {
   return <svg className="discover-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10.5 10.5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>;
 }
+function IdentifyFabIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 8c0-1.1.9-2 2-2h1.8l1.4-2.4h7.6L17.2 6H19a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" strokeWidth="1.6"/>
+      <circle cx="12" cy="13" r="3.3" stroke="currentColor" strokeWidth="1.6"/>
+    </svg>
+  );
+}
+
 function PlusIcon() {
   return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 }

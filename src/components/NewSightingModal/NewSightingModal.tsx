@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBirdStore } from '../../store/useBirdStore';
+import { useIdentifyStore } from '../../store/useIdentifyStore';
 import { CustomCalendar } from '../CustomCalendar/CustomCalendar';
 import { getPositionOnce, formatCoordsLabel } from '../../utils/gps';
 import type { Bird } from '../../types/bird';
@@ -12,7 +12,7 @@ interface NewSightingModalProps {
   preselectedBird?: Bird | null;
 }
 
-type Panel = 'choose' | 'log' | 'identify';
+type Panel = 'choose' | 'log';
 
 const TODAY = new Date().toISOString().split('T')[0];
 
@@ -61,9 +61,6 @@ export function NewSightingModal({ onClose, preselectedBird }: NewSightingModalP
               preselectedBird={preselectedBird}
             />
           )}
-          {panel === 'identify' && (
-            <IdentifyPanel key="identify" onClose={onClose} onBack={() => setPanel('choose')} />
-          )}
         </AnimatePresence>
       </motion.div>
     </div>
@@ -72,11 +69,9 @@ export function NewSightingModal({ onClose, preselectedBird }: NewSightingModalP
 
 /* ── Panel: Choose path ────────────────────────────────────── */
 function ChoosePanel({ onClose, onChoose }: { onClose: () => void; onChoose: (p: Panel) => void }) {
-  const navigate = useNavigate();
-
   const handleIdentify = () => {
     onClose();
-    navigate('/identify');
+    useIdentifyStore.getState().open();
   };
 
   return (
@@ -339,38 +334,6 @@ function LogPanel({
   );
 }
 
-/* ── Panel: Identify (coming soon) ─────────────────────────── */
-function IdentifyPanel({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
-  return (
-    <motion.div
-      className="nsm-panel"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.18 }}
-    >
-      <div className="nsm-header">
-        <button className="nsm-back" onClick={onBack} aria-label="Back"><BackIcon /></button>
-        <h2 className="nsm-title">Identify a Bird</h2>
-        <button className="nsm-close" onClick={onClose} aria-label="Close"><CloseIcon /></button>
-      </div>
-      <div className="nsm-body nsm-identify-body">
-        <div className="nsm-identify-icon"><SearchLargeIcon /></div>
-        <p className="nsm-identify-headline">Photo & audio ID coming soon</p>
-        <p className="nsm-identify-desc">
-          Snap a photo or record a bird call and we'll identify the species for you.
-        </p>
-        <ul className="nsm-identify-features">
-          <li>AI-powered photo recognition</li>
-          <li>Bird call audio matching</li>
-          <li>Ranked results with confidence scores</li>
-          <li>One-tap logging of identified species</li>
-        </ul>
-      </div>
-    </motion.div>
-  );
-}
-
 /* ── Helpers ─────────────────────────────────────────────────── */
 function formatDisplayDate(ymd: string): string {
   const [y, m, d] = ymd.split('-').map(Number);
@@ -403,7 +366,4 @@ function CalIcon() {
 }
 function GpsIcon() {
   return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>;
-}
-function SearchLargeIcon() {
-  return <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="22" cy="22" r="13" stroke="currentColor" strokeWidth="2.5"/><path d="M32 32l9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/><path d="M18 22h8M22 18v8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 }

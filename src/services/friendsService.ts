@@ -19,6 +19,18 @@ export interface ActivityItem {
 
 export type FriendshipStatus = 'none' | 'pending_sent' | 'pending_received' | 'accepted';
 
+export interface PeckRow {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  created_at: string;
+  seen_at: string | null;
+}
+
+export interface PeckWithSender extends PeckRow {
+  sender: ProfileRow;
+}
+
 // ── Profile ───────────────────────────────────────────────────────────────────
 
 export async function getProfileByUsername(username: string): Promise<ProfileRow | null> {
@@ -261,4 +273,54 @@ export async function getFriendActivity(
   }
 
   return items;
+}
+
+
+// ── Pecks ─────────────────────────────────────────────────────────────────────
+// A peck is a wordless, one-tap nudge between accepted friends — the bird-app
+// answer to a poke. No message, no compose step: tap it, it's sent.
+
+export async function sendPeck(
+  senderId: string,
+  recipientId: string,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('pecks')
+    .insert({ sender_id: senderId, recipient_id: recipientId });
+
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+export async function getRecentPecks(userId: string, limit = 20): Promise<PeckWithSender[]> {
+  const { data, error } = await supabase
+    .from('pecks')
+    .select('*, sender:profiles!pecks_sender_id_fkey(*)')
+    .eq('recipient_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data as unknown as PeckWithSender[];
+}
+
+export async function getUnseenPeckCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('pecks')
+    .select('*', { count: 'exact', head: true })
+    .eq('recipient_id', userId)
+    .is('seen_at', null);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
+export async function markPecksSeen(userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('pecks')
+    .update({ seen_at: new Date().toISOString() })
+    .eq('recipient_id', userId)
+    .is('seen_at', null);
+
+  if (error) console.error('[friendsService] markPecksSeen error:', error.message);
 }

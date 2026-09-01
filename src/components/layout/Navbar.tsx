@@ -5,12 +5,12 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useLocationStore } from '../../store/useLocationStore';
 import { SPIRIT_BIRDS } from '../../data/spiritBirds';
 import { LocationModal } from '../LocationModal/LocationModal';
+import { useUnseenPecks } from '../../hooks/useUnseenPecks';
 import './Navbar.css';
 
 const TABS = [
   { to: '/',         label: 'My Birds',  end: true  },
   { to: '/discover', label: 'Discover',  end: false },
-  { to: '/identify', label: 'Identify',  end: false },
   { to: '/friends',  label: 'Friends',   end: false },
 ];
 
@@ -29,6 +29,7 @@ export function Navbar() {
   const requestLocation = useLocationStore((s) => s.requestLocation);
 
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const unseenPecks = useUnseenPecks();
 
   const spiritBird = spiritBirdCode
     ? SPIRIT_BIRDS.find((b) => b.speciesCode === spiritBirdCode) ?? null
@@ -141,6 +142,9 @@ export function Navbar() {
             className={({ isActive }) => `nb-tab ${isActive ? 'nb-tab--active' : ''}`}
           >
             {label}
+            {to === '/friends' && unseenPecks > 0 && (
+              <span className="nb-tab-badge" aria-label={`${unseenPecks} new pecks`} />
+            )}
           </NavLink>
         ))}
       </nav>

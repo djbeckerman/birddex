@@ -264,3 +264,11 @@
 @media (max-width: 480px) {
   .pp-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 0 12px 16px; }
 }
+
+.pp-action-btn--peck {
+  background: #C8792F;
+  color: #FDFAF4;
+  border-color: #C8792F;
+}
+.pp-action-btn--peck:hover:not(:disabled) { background: #B36A26; }
+.pp-action-btn--peck:disabled { opacity: 0.7; cursor: default; }

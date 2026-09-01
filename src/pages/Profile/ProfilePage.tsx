@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -81,6 +81,15 @@ export function ProfilePage() {
     mutationFn: () => friendsService.sendFriendRequest(session!.user.id, username!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['friendship-status', session?.user.id, profile?.id] });
+    },
+  });
+
+  const [peckSent, setPeckSent] = useState(false);
+  const sendPeck = useMutation({
+    mutationFn: () => friendsService.sendPeck(session!.user.id, profile!.id),
+    onSuccess: () => {
+      setPeckSent(true);
+      setTimeout(() => setPeckSent(false), 2500);
     },
   });
 
@@ -216,7 +225,16 @@ export function ProfilePage() {
             Accept Request
           </button>
         ) : (
-          <span className="pp-action-btn pp-action-btn--friends">✓ Friends</span>
+          <>
+            <span className="pp-action-btn pp-action-btn--friends">✓ Friends</span>
+            <button
+              className="pp-action-btn pp-action-btn--peck"
+              onClick={() => sendPeck.mutate()}
+              disabled={sendPeck.isPending || peckSent}
+            >
+              {peckSent ? 'Pecked!' : `Peck ${profile.display_name ?? profile.username}`}
+            </button>
+          </>
         )}
       </div>
 

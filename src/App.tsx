@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NotebookLayout } from './components/layout/NotebookLayout';
@@ -19,6 +19,7 @@ import { InvitePage } from './pages/Invite/InvitePage';
 import { useBirdStore } from './store/useBirdStore';
 import { useAuthStore } from './store/useAuthStore';
 import { useLocationStore } from './store/useLocationStore';
+import { useIdentifyStore } from './store/useIdentifyStore';
 import { supabase } from './lib/supabase';
 import * as sightingsService from './services/sightingsService';
 import { track, identifyUser } from './lib/posthog';
@@ -50,7 +51,7 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path="/"                    element={<CollectionPage />} />
           <Route path="/discover"            element={<DiscoverPage />} />
-          <Route path="/identify"            element={<IdentifyPage />} />
+          <Route path="/identify"            element={<Navigate to="/discover" replace />} />
           <Route path="/friends"             element={<FriendsPage />} />
           <Route path="/profile/:username"   element={<ProfilePage />} />
         </Routes>
@@ -88,6 +89,9 @@ function AppShell() {
   } = useAuthStore();
 
   const checkAndRequest = useLocationStore((s) => s.checkAndRequest);
+
+  const isIdentifyOpen = useIdentifyStore((s) => s.isOpen);
+  const closeIdentify   = useIdentifyStore((s) => s.close);
 
   const [phase, setPhase] = useState<AppPhase>('loading');
   const [onboardingLogBird, setOnboardingLogBird] = useState<Bird | null>(null);
@@ -274,6 +278,13 @@ function AppShell() {
             onClose={() => setOnboardingLogBird(null)}
           />
         )}
+      </AnimatePresence>
+
+      {/* Identify overlay — mounted once here so it can be launched from
+          anywhere (Discover's identify button, New Sighting's "Help me
+          identify it" path) without either needing to know about routing. */}
+      <AnimatePresence>
+        {isIdentifyOpen && <IdentifyPage onClose={closeIdentify} />}
       </AnimatePresence>
     </NotebookLayout>
   );
