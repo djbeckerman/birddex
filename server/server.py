@@ -3,6 +3,7 @@ BirdDex BirdNET Server
 Accepts audio uploads and returns species predictions using BirdNET-Analyzer.
 """
 import base64
+import io
 import os
 import re
 import tempfile
@@ -11,6 +12,15 @@ from datetime import date, datetime
 import httpx
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+
+try:
+    from PIL import Image
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+    HEIC_SUPPORT = True
+except Exception as e:
+    HEIC_SUPPORT = False
+    print(f"WARNING: HEIC support unavailable: {e}")
 
 try:
     from birdnetlib import Recording
@@ -79,8 +89,25 @@ async def identify_photo(
     if not ANTHROPIC_API_KEY:
         return {"matches": [], "error": "Photo identification is not configured on the server (missing ANTHROPIC_API_KEY)."}
 
-    media_type = image.content_type if image.content_type in _SUPPORTED_IMAGE_TYPES else "image/jpeg"
     image_bytes = await image.read()
+    filename = (image.filename or "").lower()
+    is_heic = (image.content_type in ("image/heic", "image/heif")) or filename.endswith((".heic", ".heif"))
+
+    if is_heic:
+        if not HEIC_SUPPORT:
+            return {"matches": [], "error": "HEIC photos aren't supported right now — try a JPEG or PNG instead."}
+        try:
+            with Image.open(io.BytesIO(image_bytes)) as im:
+                im = im.convert("RGB")
+                buf = io.BytesIO()
+                im.save(buf, format="JPEG", quality=90)
+                image_bytes = buf.getvalue()
+            media_type = "image/jpeg"
+        except Exception:
+            return {"matches": [], "error": "Could not read that photo — try a JPEG or PNG instead."}
+    else:
+        media_type = image.content_type if image.content_type in _SUPPORTED_IMAGE_TYPES else "image/jpeg"
+
     b64_data = base64.b64encode(image_bytes).decode("ascii")
 
     month = datetime.now().strftime("%B")
