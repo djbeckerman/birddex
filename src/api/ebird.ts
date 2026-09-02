@@ -36,49 +36,65 @@ export async function fetchLocalBirds(lat: number, lng: number): Promise<Bird[]>
     // corrupt cache — proceed with fetch
   }
 
+  const BACK_WINDOW_DAYS = 30;
+
   try {
-    const resp = await ebirdClient.get<EBirdObservation[]>('/data/obs/geo/recent', {
-      params: {
-        lat,
-        lng,
-        dist: DIST_KM,
-        back: 30,
-        maxResults: 10000,
-      },
-    });
+    // eBird's "recent nearby" endpoint returns only the single most recent
+    // sighting per species — no real frequency signal. So instead:
+    //  - "Most likely nearby" ranks by how recently each species was last
+    //    seen (freshest first), which also captures seasonality for free
+    //    since it's already a rolling 30-day window.
+    //  - "Rarest first" uses eBird's own notable/rare-sightings feed as a
+    //    genuine rarity signal, rather than guessing from a tied score.
+    const [obsResp, notableResp] = await Promise.all([
+      ebirdClient.get<EBirdObservation[]>('/data/obs/geo/recent', {
+        params: { lat, lng, dist: DIST_KM, back: BACK_WINDOW_DAYS, maxResults: 10000 },
+      }),
+      ebirdClient
+        .get<EBirdObservation[]>('/data/obs/geo/recent/notable', {
+          params: { lat, lng, dist: DIST_KM, back: BACK_WINDOW_DAYS },
+        })
+        .catch(() => ({ data: [] as EBirdObservation[] })), // nice-to-have — don't fail the whole fetch if this one errors
+    ]);
 
-    const observations: EBirdObservation[] = resp.data ?? [];
+    const observations: EBirdObservation[] = obsResp.data ?? [];
+    const notableCodes = new Set((notableResp.data ?? []).map((o) => o.speciesCode));
 
-    // Aggregate by species code
-    const speciesMap: Record<string, { comName: string; sciName: string; count: number }> = {};
+    // Keep each species' most recent sighting (there's usually only one row anyway)
+    const speciesMap: Record<string, { comName: string; sciName: string; obsDt: string }> = {};
     for (const obs of observations) {
       if (!obs.speciesCode || !obs.comName) continue;
-      if (speciesMap[obs.speciesCode]) {
-        speciesMap[obs.speciesCode].count++;
-      } else {
-        speciesMap[obs.speciesCode] = { comName: obs.comName, sciName: obs.sciName, count: 1 };
+      const existing = speciesMap[obs.speciesCode];
+      if (!existing || obs.obsDt > existing.obsDt) {
+        speciesMap[obs.speciesCode] = { comName: obs.comName, sciName: obs.sciName, obsDt: obs.obsDt };
       }
     }
 
     const entries = Object.entries(speciesMap);
     if (entries.length === 0) return FALLBACK_LOCAL_BIRDS;
 
-    const maxCount = Math.max(...entries.map(([, v]) => v.count));
+    const now = Date.now();
 
     const result: Bird[] = entries
-      .sort(([, a], [, b]) => b.count - a.count)
-      .map(([speciesCode, { comName, sciName, count }], index) => ({
-        speciesCode,
-        comName,
-        sciName,
-        order: '',
-        familyComName: '',
-        familySciName: '',
-        taxonOrder: index + 1,
-        category: 'species',
-        observationCount: count,
-        likelihoodScore: Math.max(1, Math.round((count / maxCount) * 100)),
-      }));
+      .map(([speciesCode, { comName, sciName, obsDt }], index) => {
+        const daysAgo = Math.max(0, (now - new Date(obsDt).getTime()) / (1000 * 60 * 60 * 24));
+        const clampedDaysAgo = Math.min(daysAgo, BACK_WINDOW_DAYS);
+        const likelihoodScore = Math.max(1, Math.round(((BACK_WINDOW_DAYS - clampedDaysAgo) / BACK_WINDOW_DAYS) * 100));
+        return {
+          speciesCode,
+          comName,
+          sciName,
+          order: '',
+          familyComName: '',
+          familySciName: '',
+          taxonOrder: index + 1,
+          category: 'species',
+          likelihoodScore,
+          isNotable: notableCodes.has(speciesCode),
+          lastObservedAt: obsDt,
+        };
+      })
+      .sort((a, b) => (b.likelihoodScore ?? 0) - (a.likelihoodScore ?? 0));
 
     try {
       sessionStorage.setItem(
@@ -124,8 +140,8 @@ const FALLBACK_LOCAL_BIRDS: Bird[] = [
   { speciesCode: 'bcnher',  comName: 'Black-crowned Night-Heron',  sciName: 'Nycticorax nycticorax',      order: 'Pelecaniformes',    familyComName: 'Herons, Egrets, Bitterns', familySciName: 'Ardeidae',  taxonOrder: 24, category: 'species', observationCount: 42, likelihoodScore: 44 },
   { speciesCode: 'comrav',  comName: 'Common Raven',               sciName: 'Corvus corax',               order: 'Passeriformes',     familyComName: 'Crows, Jays, Magpies', familySciName: 'Corvidae',     taxonOrder: 25, category: 'species', observationCount: 40, likelihoodScore: 42 },
   { speciesCode: 'buffle',  comName: 'Bufflehead',                 sciName: 'Bucephala albeola',          order: 'Anseriformes',      familyComName: 'Ducks, Geese, Swans', familySciName: 'Anatidae',      taxonOrder: 26, category: 'species', observationCount: 37, likelihoodScore: 39 },
-  { speciesCode: 'whtkite', comName: 'White-tailed Kite',          sciName: 'Elanus leucurus',            order: 'Accipitriformes',   familyComName: 'Hawks, Eagles, Kites', familySciName: 'Accipitridae',  taxonOrder: 27, category: 'species', observationCount: 34, likelihoodScore: 36 },
-  { speciesCode: 'lobcur',  comName: 'Long-billed Curlew',         sciName: 'Numenius americanus',        order: 'Charadriiformes',   familyComName: 'Sandpipers, Phalaropes', familySciName: 'Scolopacidae',  taxonOrder: 28, category: 'species', observationCount: 30, likelihoodScore: 32 },
-  { speciesCode: 'allhum',  comName: "Allen's Hummingbird",        sciName: 'Selasphorus sasin',          order: 'Apodiformes',       familyComName: 'Hummingbirds',      familySciName: 'Trochilidae',       taxonOrder: 29, category: 'species', observationCount: 27, likelihoodScore: 28 },
-  { speciesCode: 'perfal',  comName: 'Peregrine Falcon',           sciName: 'Falco peregrinus',           order: 'Falconiformes',     familyComName: 'Falcons, Caracaras', familySciName: 'Falconidae',       taxonOrder: 30, category: 'species', observationCount: 22, likelihoodScore: 23 },
+  { speciesCode: 'whtkite', comName: 'White-tailed Kite',          sciName: 'Elanus leucurus',            order: 'Accipitriformes',   familyComName: 'Hawks, Eagles, Kites', familySciName: 'Accipitridae',  taxonOrder: 27, category: 'species', observationCount: 34, likelihoodScore: 36, isNotable: true },
+  { speciesCode: 'lobcur',  comName: 'Long-billed Curlew',         sciName: 'Numenius americanus',        order: 'Charadriiformes',   familyComName: 'Sandpipers, Phalaropes', familySciName: 'Scolopacidae',  taxonOrder: 28, category: 'species', observationCount: 30, likelihoodScore: 32, isNotable: true },
+  { speciesCode: 'allhum',  comName: "Allen's Hummingbird",        sciName: 'Selasphorus sasin',          order: 'Apodiformes',       familyComName: 'Hummingbirds',      familySciName: 'Trochilidae',       taxonOrder: 29, category: 'species', observationCount: 27, likelihoodScore: 28, isNotable: true },
+  { speciesCode: 'perfal',  comName: 'Peregrine Falcon',           sciName: 'Falco peregrinus',           order: 'Falconiformes',     familyComName: 'Falcons, Caracaras', familySciName: 'Falconidae',       taxonOrder: 30, category: 'species', observationCount: 22, likelihoodScore: 23, isNotable: true },
 ];

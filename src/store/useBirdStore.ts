@@ -79,7 +79,7 @@ export const useBirdStore = create<BirdState>()(
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (!session) return;
           const bird = get().allBirds.find((b) => b.speciesCode === speciesCode);
-          track('bird_spotted', { species: bird?.comName ?? speciesCode, rarity: bird?.observationCount });
+          track('bird_spotted', { species: bird?.comName ?? speciesCode, rarity: bird?.isNotable ? 'notable' : 'common' });
           if (isFirst) track('first_bird_spotted', { species: bird?.comName ?? speciesCode });
           sightingsService
             .upsertSighting(session.user.id, speciesCode, bird?.comName ?? '', bird?.sciName ?? '', entry)

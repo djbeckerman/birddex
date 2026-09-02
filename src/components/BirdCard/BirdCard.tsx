@@ -348,11 +348,12 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
                     {bird.order && <span style={{ color: 'var(--ink-muted)' }}>Order: {bird.order}</span>}
                   </p>
                 </div>
-                {bird.observationCount != null && (
+                {(bird.lastObservedAt || bird.isNotable) && (
                   <div className="bird-card-section">
                     <h4 className="bird-card-section-title">Local Frequency</h4>
                     <p className="bird-card-section-text">
-                      Observed {bird.observationCount} time{bird.observationCount !== 1 ? 's' : ''} in your area recently.
+                      {bird.isNotable && "Flagged as a notable/rare sighting nearby. "}
+                      {bird.lastObservedAt && `Last reported nearby on ${formatDate(bird.lastObservedAt)}.`}
                     </p>
                   </div>
                 )}

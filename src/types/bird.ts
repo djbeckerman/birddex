@@ -7,10 +7,14 @@ export interface Bird {
   familySciName: string;
   taxonOrder: number;
   category: string;
-  /** How many times this species was observed near the user's location recently */
+  /** How many times this species was observed near the user's location recently (fallback list only) */
   observationCount?: number;
-  /** 0–100 normalized likelihood score for the user's location */
+  /** 0–100 normalized likelihood score for the user's location (recency-based) */
   likelihoodScore?: number;
+  /** True if eBird currently flags this species as locally/nationally notable (rare) nearby */
+  isNotable?: boolean;
+  /** ISO date of the most recent nearby sighting, when known */
+  lastObservedAt?: string;
 }
 
 export type RarityTier = 'common' | 'uncommon' | 'rare';

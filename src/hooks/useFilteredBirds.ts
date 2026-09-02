@@ -158,9 +158,14 @@ export function useFilteredBirds(
           return tb.localeCompare(ta); // most recent first
         }
 
-        case 'rarest':
-          // Lowest likelihood score first (hardest to find locally)
+        case 'rarest': {
+          // eBird-flagged notable/rare sightings first; within each group,
+          // least-recently-seen first as a tiebreaker
+          const aNotable = a.isNotable ? 1 : 0;
+          const bNotable = b.isNotable ? 1 : 0;
+          if (aNotable !== bNotable) return bNotable - aNotable;
           return (a.likelihoodScore ?? 0) - (b.likelihoodScore ?? 0);
+        }
 
         case 'likelihood':
         default:
