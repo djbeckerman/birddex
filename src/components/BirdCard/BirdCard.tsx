@@ -193,8 +193,8 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
               ) : (
                 <button
                   className={`bird-card-toggle ${bird.isSpotted ? 'bird-card-toggle--spotted' : ''}`}
-                  onClick={handleToggle}
-                  aria-label={bird.isSpotted ? 'Remove from spotted' : 'Mark as spotted'}
+                  onClick={bird.isSpotted ? (e) => { e.stopPropagation(); handleFlip(); } : handleToggle}
+                  aria-label={bird.isSpotted ? 'View details' : 'Mark as spotted'}
                 >
                   {bird.isSpotted ? <><CheckIcon /> Spotted</> : <><EyeIcon /> Log</>}
                 </button>
