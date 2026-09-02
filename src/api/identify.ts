@@ -46,91 +46,29 @@ export async function identifyBySound(
 }
 
 // ── Photo identification ──────────────────────────────────────────────────────
+// Runs server-side (via the same Railway server that powers sound ID) so the
+// Anthropic API key never ships in the client bundle.
 
 export async function identifyByPhoto(
   imageFile: File,
   lat?: number,
   lng?: number,
 ): Promise<IdentifyMatch[]> {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY as string;
-  if (!apiKey) throw new Error('VITE_ANTHROPIC_API_KEY is not set in your .env file.');
+  const serverUrl = (import.meta.env.VITE_BIRDNET_URL as string) || 'http://localhost:5001';
 
-  const base64 = await fileToBase64(imageFile);
-  const mediaType = normalizeMediaType(imageFile.type);
+  const form = new FormData();
+  form.append('image', imageFile, imageFile.name || 'photo.jpg');
+  if (lat != null) form.append('lat', String(lat));
+  if (lng != null) form.append('lng', String(lng));
 
-  const month = new Date().toLocaleString('en-US', { month: 'long' });
-  const locationStr =
-    lat != null && lng != null
-      ? `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lng).toFixed(3)}°${lng >= 0 ? 'E' : 'W'}`
-      : 'Santa Monica, California';
-
-  const prompt = `You are an expert birder. Identify the bird species in this photo.
-The photo was taken in ${month} near ${locationStr} in the Santa Monica / LA Coast region of California.
-
-Return ONLY valid JSON in this exact format, no other text:
-{"matches":[{"commonName":"...","scientificName":"...","confidence":85,"funFact":"One interesting sentence."}]}
-
-Rules:
-- Up to 5 matches, sorted by confidence descending
-- confidence is an integer 0–100
-- Only include species plausible for coastal Southern California in ${month}
-- funFact is exactly one concise sentence about the species
-- If no bird is clearly visible: {"matches":[],"reason":"brief explanation"}`;
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-5',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-            { type: 'text', text: prompt },
-          ],
-        },
-      ],
-    }),
-  });
-
+  const res = await fetch(`${serverUrl}/identify-photo`, { method: 'POST', body: form });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({})) as { error?: { message?: string } };
-    throw new Error(err.error?.message ?? `API error ${res.status}`);
+    const err = await res.json().catch(() => ({})) as { error?: string };
+    throw new Error(err.error ?? `Server error ${res.status}`);
   }
 
-  const data = await res.json() as { content?: Array<{ text?: string }> };
-  const text = data.content?.[0]?.text ?? '';
-
-  // Extract JSON from response (Claude may wrap it in markdown)
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Could not parse response from field guide.');
-
-  const parsed = JSON.parse(jsonMatch[0]) as { matches?: IdentifyMatch[] };
-  return parsed.matches ?? [];
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function normalizeMediaType(type: string): 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' {
-  if (type === 'image/png') return 'image/png';
-  if (type === 'image/gif') return 'image/gif';
-  if (type === 'image/webp') return 'image/webp';
-  return 'image/jpeg';
+  const data = await res.json() as { matches?: IdentifyMatch[]; error?: string };
+  if (data.error) throw new Error(data.error);
+  return data.matches ?? [];
 }
 
