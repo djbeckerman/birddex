@@ -176,28 +176,30 @@ export function BirdCard({ bird, index, variant = 'collection', onQuickSpot }: B
 
             <div className="bird-card-actions">
               <button
-                className="bird-card-flip-btn"
+                className={`bird-card-flip-btn ${bird.isSpotted ? 'bird-card-flip-btn--full' : ''}`}
                 onClick={(e) => { e.stopPropagation(); handleFlip(); }}
                 aria-label="View details"
               >
                 <FlipIcon /> Details
               </button>
-              {isDiscover && !bird.isSpotted ? (
-                <button
-                  className="bird-card-quick-spot-btn"
-                  onClick={handleQuickSpot}
-                  aria-label="I spotted this!"
-                >
-                  <EyeIcon /> I spotted this!
-                </button>
-              ) : (
-                <button
-                  className={`bird-card-toggle ${bird.isSpotted ? 'bird-card-toggle--spotted' : ''}`}
-                  onClick={bird.isSpotted ? (e) => { e.stopPropagation(); handleFlip(); } : handleToggle}
-                  aria-label={bird.isSpotted ? 'View details' : 'Mark as spotted'}
-                >
-                  {bird.isSpotted ? <><CheckIcon /> Spotted</> : <><EyeIcon /> Log</>}
-                </button>
+              {!bird.isSpotted && (
+                isDiscover ? (
+                  <button
+                    className="bird-card-quick-spot-btn"
+                    onClick={handleQuickSpot}
+                    aria-label="I spotted this!"
+                  >
+                    <EyeIcon /> I spotted this!
+                  </button>
+                ) : (
+                  <button
+                    className="bird-card-toggle"
+                    onClick={handleToggle}
+                    aria-label="Mark as spotted"
+                  >
+                    <EyeIcon /> Log
+                  </button>
+                )
               )}
             </div>
           </div>

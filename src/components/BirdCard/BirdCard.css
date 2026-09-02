@@ -204,6 +204,10 @@
   color: var(--forest-green-dk);
 }
 
+.bird-card-flip-btn--full {
+  border-right: none;
+}
+
 .bird-card-toggle {
   display: flex;
   align-items: center;
@@ -224,15 +228,6 @@
 .bird-card-toggle:hover {
   background: rgba(107, 143, 74, 0.08);
   color: var(--forest-green-dk);
-}
-
-.bird-card-toggle--spotted {
-  color: var(--forest-green-dk);
-}
-
-.bird-card-toggle--spotted:hover {
-  background: rgba(200, 50, 50, 0.06);
-  color: #8B3030;
 }
 
 /* Unspotted card — faded overall */
